@@ -16,7 +16,7 @@
 
 Thank you for visiting the **KrishiMitra AI** repository.
 
-This project was created to explore how **AI can empower rural farmers** by making agricultural knowledge accessible through a simple phone call.
+This project is created to explore how **AI can empower rural farmers** by making agricultural knowledge accessible through a simple phone call.
 
 ---
 
