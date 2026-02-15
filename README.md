@@ -53,25 +53,3 @@ C --> D[🤖 Amazon Lex + Lambda]
 D --> E[🔊 Amazon Polly]
 E --> F[👨‍🌾 Voice Response]
 ```
-## 💻 Prototype Code
-
-```python
-import json
-
-def lambda_handler(event, context):
-    user_query = event.get("query", "").lower()
-
-    if "weather" in user_query:
-        response = "Kal barish ki sambhavna 70 pratishat hai."
-    elif "fertilizer" in user_query:
-        response = "Gehu ke liye Nitrogen aur Phosphorus ka upyog karein."
-    elif "scheme" in user_query:
-        response = "PM Kisan Yojana mein aapko varshik arthik sahayata mil sakti hai."
-    else:
-        response = "Kripya apna prashn dobara poochiye."
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps(response)
-    }
-```
