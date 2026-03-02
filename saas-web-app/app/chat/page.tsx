@@ -2,8 +2,17 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { 
+  MessageSquare, 
+  Plus, 
+  Menu, 
+  X, 
+  Send, 
+  Mic, 
+  LayoutDashboard,
+  LogOut,
+  Globe
+} from 'lucide-react';
 
 interface Message {
   id: string;
@@ -12,27 +21,71 @@ interface Message {
   timestamp: Date;
 }
 
+interface ChatSession {
+  id: string;
+  title: string;
+  lastMessage: string;
+  timestamp: Date;
+}
+
 export default function ChatPage() {
   const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [language, setLanguage] = useState<'hi' | 'en'>('hi');
+  const [language, setLanguage] = useState<string>('hi');
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string>('');
   const recognitionRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check authentication on mount
+  const languages = [
+    { code: 'hi', name: 'हिंदी', nameEn: 'Hindi', speechCode: 'hi-IN' },
+    { code: 'en', name: 'English', nameEn: 'English', speechCode: 'en-IN' },
+    { code: 'ta', name: 'தமிழ்', nameEn: 'Tamil', speechCode: 'ta-IN' },
+    { code: 'te', name: 'తెలుగు', nameEn: 'Telugu', speechCode: 'te-IN' },
+    { code: 'kn', name: 'ಕನ್ನಡ', nameEn: 'Kannada', speechCode: 'kn-IN' },
+    { code: 'ml', name: 'മലയാളം', nameEn: 'Malayalam', speechCode: 'ml-IN' },
+    { code: 'mr', name: 'मराठी', nameEn: 'Marathi', speechCode: 'mr-IN' },
+    { code: 'gu', name: 'ગુજરાતી', nameEn: 'Gujarati', speechCode: 'gu-IN' },
+    { code: 'bn', name: 'বাংলা', nameEn: 'Bengali', speechCode: 'bn-IN' },
+    { code: 'pa', name: 'ਪੰਜਾਬੀ', nameEn: 'Punjabi', speechCode: 'pa-IN' },
+    { code: 'or', name: 'ଓଡ଼ିଆ', nameEn: 'Odia', speechCode: 'or-IN' },
+    { code: 'as', name: 'অসমীয়া', nameEn: 'Assamese', speechCode: 'as-IN' }
+  ];
+
+  const getCurrentLanguage = () => {
+    return languages.find(lang => lang.code === language) || languages[0];
+  };
+
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (!user) {
-      router.push('/auth');
-    } else {
+    const authStatus = localStorage.getItem('isAuthenticated');
+    const storedName = localStorage.getItem('userName');
+    
+    if (authStatus === 'true' && storedName) {
       setIsAuthenticated(true);
-      const userData = JSON.parse(user);
-      setUserName(userData.name);
-      setLanguage(userData.language || 'hi');
+      setUserName(storedName);
+      
+      const user = localStorage.getItem('user');
+      if (user) {
+        const userData = JSON.parse(user);
+        setLanguage(userData.language || 'hi');
+      }
+      
+      // Load chat sessions from localStorage
+      const savedSessions = localStorage.getItem('chatSessions');
+      if (savedSessions) {
+        setChatSessions(JSON.parse(savedSessions));
+      }
+      
+      // Create or load current session
+      const sessionId = `session_${Date.now()}`;
+      setCurrentSessionId(sessionId);
     }
 
     // Initialize Web Speech API
@@ -41,7 +94,6 @@ export default function ChatPage() {
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -57,11 +109,48 @@ export default function ChatPage() {
         setIsListening(false);
       };
     }
-  }, [router, language]);
+  }, []);
+
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = getCurrentLanguage().speechCode;
+    }
+  }, [language]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userName');
     router.push('/');
+  };
+
+  const handleLanguageChange = (langCode: string) => {
+    setLanguage(langCode);
+    const user = localStorage.getItem('user');
+    if (user) {
+      const userData = JSON.parse(user);
+      userData.language = langCode;
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
+    setShowLanguageModal(false);
+    
+    // Add a system message to indicate language change
+    const langName = languages.find(l => l.code === langCode)?.name || langCode;
+    const systemMessage: Message = {
+      id: `msg_${Date.now()}_system`,
+      role: 'assistant',
+      content: langCode === 'hi' 
+        ? `भाषा बदल दी गई है। अब मैं ${langName} में जवाब दूंगी। 🌐`
+        : langCode === 'en'
+        ? `Language changed to ${langName}. I will now respond in English. 🌐`
+        : `Language changed to ${langName}. I will now respond in this language. 🌐`,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, systemMessage]);
   };
 
   const toggleVoiceInput = () => {
@@ -74,14 +163,26 @@ export default function ChatPage() {
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      recognitionRef.current.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+      recognitionRef.current.lang = getCurrentLanguage().speechCode;
       recognitionRef.current.start();
       setIsListening(true);
     }
   };
 
+  const createNewChat = () => {
+    setMessages([]);
+    const sessionId = `session_${Date.now()}`;
+    setCurrentSessionId(sessionId);
+  };
+
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    // Check if user is authenticated before sending
+    if (!isAuthenticated) {
+      router.push('/auth?redirect=/chat');
+      return;
+    }
 
     const userMessage: Message = {
       id: `msg_${Date.now()}`,
@@ -103,7 +204,7 @@ export default function ChatPage() {
         body: JSON.stringify({
           message: input,
           language: language,
-          history: messages.slice(-5), // Send last 5 messages for context
+          history: messages.slice(-5),
         }),
       });
 
@@ -119,7 +220,21 @@ export default function ChatPage() {
         content: data.response,
         timestamp: new Date(),
       };
+      
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Save to chat history
+      const newSession: ChatSession = {
+        id: currentSessionId,
+        title: input.substring(0, 50) + (input.length > 50 ? '...' : ''),
+        lastMessage: data.response.substring(0, 100),
+        timestamp: new Date()
+      };
+      
+      const updatedSessions = [newSession, ...chatSessions.filter(s => s.id !== currentSessionId)];
+      setChatSessions(updatedSessions);
+      localStorage.setItem('chatSessions', JSON.stringify(updatedSessions));
+      
     } catch (error: any) {
       const errorMessage: Message = {
         id: `msg_${Date.now()}_error`,
@@ -135,118 +250,255 @@ export default function ChatPage() {
     }
   };
 
-  const quickActions = [
-    { hi: '🌤️ मौसम की जानकारी', en: '🌤️ Weather Info' },
-    { hi: '💰 बाजार भाव', en: '💰 Market Prices' },
-    { hi: '🌱 फसल सलाह', en: '🌱 Crop Advice' },
-    { hi: '🏛️ सरकारी योजनाएं', en: '🏛️ Govt Schemes' },
-  ];
-
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-text/70">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+        {/* Guest View - Preview Only */}
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="text-center mb-12">
+            <div className="text-7xl mb-6 animate-bounce">🌾</div>
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">
+              KrishiMitra AI Chat
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Your intelligent farming assistant - Get expert advice in your language
+            </p>
+            
+            {/* Login Prompt */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto border-2 border-green-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Sign in to start chatting
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Create a free account to access AI-powered farming advice, weather updates, market prices, and more!
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => router.push('/auth?redirect=/chat')}
+                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all hover:scale-105"
+                >
+                  Sign In / Sign Up
+                </button>
+                <button
+                  onClick={() => router.push('/')}
+                  className="px-8 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all"
+                >
+                  Back to Home
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Preview */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              { icon: '🌤️', title: 'Weather Info', desc: 'Real-time weather forecasts' },
+              { icon: '🌱', title: 'Crop Advice', desc: 'Expert cultivation guidance' },
+              { icon: '💰', title: 'Market Prices', desc: 'Latest mandi rates' },
+              { icon: '🏛️', title: 'Govt Schemes', desc: 'Subsidy information' }
+            ].map((feature, idx) => (
+              <div key={idx} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 text-center">
+                <div className="text-5xl mb-4">{feature.icon}</div>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Language Support */}
+          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-8 text-white text-center">
+            <h2 className="text-3xl font-bold mb-4">12+ Indian Languages Supported</h2>
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
+              {['हिंदी', 'English', 'தமிழ்', 'తెలుగు', 'ಕನ್ನಡ', 'മലയാളം', 'मराठी', 'ગુજરાતી'].map((lang, idx) => (
+                <span key={idx} className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+                  {lang}
+                </span>
+              ))}
+            </div>
+            <p className="text-green-100">Chat in your preferred language with voice input support</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-primary mb-2">AI Chat Dashboard</h1>
-              <p className="text-text/70">
-                Welcome, {userName}! Ask questions about crops, weather, schemes, and more
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-sm text-primary hover:bg-primary/5 rounded-full transition-colors"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className={`${showSidebar ? 'w-64' : 'w-0'} bg-gray-900 text-white transition-all duration-300 overflow-hidden flex flex-col`}>
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-gray-700">
+          <button
+            onClick={createNewChat}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">New Chat</span>
+          </button>
+        </div>
 
-          {/* Language Selector */}
-          <div className="mb-6 flex gap-2">
+        {/* Chat History */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          <div className="text-xs text-gray-400 px-3 py-2 font-semibold">Recent Chats</div>
+          {chatSessions.map((session) => (
             <button
-              onClick={() => setLanguage('hi')}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
-                language === 'hi'
-                  ? 'bg-primary text-white'
-                  : 'bg-white text-primary border border-primary/20'
+              key={session.id}
+              onClick={() => setCurrentSessionId(session.id)}
+              className={`w-full text-left px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors ${
+                currentSessionId === session.id ? 'bg-gray-800' : ''
               }`}
             >
-              हिंदी
-            </button>
-            <button
-              onClick={() => setLanguage('en')}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
-                language === 'en'
-                  ? 'bg-primary text-white'
-                  : 'bg-white text-primary border border-primary/20'
-              }`}
-            >
-              English
-            </button>
-          </div>
-
-          {/* Quick Actions */}
-          {messages.length === 0 && (
-            <div className="mb-6 glass p-6 rounded-lg shadow-soft">
-              <p className="text-sm text-text/70 mb-3">
-                {language === 'hi' ? 'त्वरित प्रश्न:' : 'Quick Actions:'}
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {quickActions.map((action, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setInput(language === 'hi' ? action.hi : action.en)}
-                    className="px-4 py-2 bg-white text-left text-sm rounded-lg hover:bg-primary/5 transition-colors border border-primary/10"
-                  >
-                    {language === 'hi' ? action.hi : action.en}
-                  </button>
-                ))}
+              <div className="flex items-start gap-2">
+                <MessageSquare className="w-4 h-4 mt-1 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{session.title}</p>
+                  <p className="text-xs text-gray-400 truncate">{session.lastMessage}</p>
+                </div>
               </div>
-            </div>
-          )}
+            </button>
+          ))}
+        </div>
 
-          {/* Chat Messages */}
-          <div className="glass rounded-lg shadow-soft p-6 mb-6 min-h-[400px] max-h-[500px] overflow-y-auto">
+        {/* Sidebar Footer */}
+        <div className="p-3 border-t border-gray-700 space-y-2">
+          <button
+            onClick={() => router.push('/dashboard/farmer')}
+            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-sm">Dashboard</span>
+          </button>
+          
+          <button
+            onClick={() => setShowLanguageModal(true)}
+            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            <Globe className="w-5 h-5" />
+            <span className="text-sm">{getCurrentLanguage().nameEn}</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors text-red-400"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm">Logout</span>
+          </button>
+
+          <div className="px-3 py-2 text-xs text-gray-400">
+            <p className="font-medium text-white">{userName}</p>
+            <p>KrishiMitra AI Assistant</p>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Top Bar */}
+        <header className="bg-white border-b px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {showSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">KrishiMitra AI</h1>
+              <p className="text-xs text-gray-500">Your farming assistant</p>
+            </div>
+          </div>
+          
+          <button
+            onClick={() => setShowLanguageModal(true)}
+            className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+          >
+            {getCurrentLanguage().name}
+          </button>
+        </header>
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="max-w-3xl mx-auto space-y-6">
             {messages.length === 0 ? (
-              <div className="text-center text-text/50 py-20">
-                <p className="text-lg mb-2">
-                  {language === 'hi' ? 'अपना पहला सवाल पूछें' : 'Ask your first question'}
-                </p>
-                <p className="text-sm">
+              <div className="text-center py-12">
+                <div className="text-7xl mb-6 animate-bounce">🌾</div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                  {language === 'hi' ? 'नमस्ते!' : 'Hello!'} {userName}
+                </h2>
+                <p className="text-xl text-gray-600 mb-8">
                   {language === 'hi' 
-                    ? 'फसल, मौसम, योजनाओं या बाजार के बारे में पूछें'
-                    : 'Ask about crops, weather, schemes, or markets'}
+                    ? 'मैं कृषिमित्र हूं, आपकी कृषि सहायक। मुझसे कुछ भी पूछें!'
+                    : 'I\'m KrishiMitra, your farming assistant. Ask me anything!'}
                 </p>
+                
+                {/* Suggestion Chips */}
+                <div className="mb-8">
+                  <p className="text-sm text-gray-500 mb-4">
+                    {language === 'hi' ? 'लोकप्रिय प्रश्न:' : 'Popular Questions:'}
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center max-w-3xl mx-auto">
+                    {(language === 'hi' ? [
+                      'मेरी फसल की पत्तियां पीली हो रही हैं',
+                      'टमाटर के लिए सबसे अच्छा उर्वरक',
+                      'मौसम की सलाह चाहिए',
+                      'गेहूं की बुवाई का समय',
+                      'कीट नियंत्रण के उपाय',
+                      'सरकारी योजनाएं'
+                    ] : [
+                      'My crop leaves are turning yellow',
+                      'Best fertilizer for tomato',
+                      'Weather forecast advice',
+                      'When to sow wheat',
+                      'Pest control measures',
+                      'Government schemes'
+                    ]).map((suggestion, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setInput(suggestion)}
+                        className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium hover:bg-green-100 hover:scale-105 transition-all border border-green-200"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Feature Cards */}
+                <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  {[
+                    { icon: '🌤️', text: language === 'hi' ? 'मौसम की जानकारी' : 'Weather Info', color: 'blue' },
+                    { icon: '🌱', text: language === 'hi' ? 'फसल सलाह' : 'Crop Advice', color: 'green' },
+                    { icon: '💰', text: language === 'hi' ? 'बाजार भाव' : 'Market Prices', color: 'yellow' },
+                    { icon: '🏛️', text: language === 'hi' ? 'सरकारी योजनाएं' : 'Govt Schemes', color: 'purple' }
+                  ].map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setInput(item.text)}
+                      className="group flex items-center gap-4 p-5 bg-white border-2 border-gray-200 rounded-2xl hover:border-green-500 hover:shadow-lg hover:scale-105 transition-all text-left"
+                    >
+                      <div className="text-4xl group-hover:scale-110 transition-transform">{item.icon}</div>
+                      <span className="font-semibold text-gray-800 group-hover:text-green-600 transition-colors">{item.text}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <>
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
                   >
                     <div
-                      className={`max-w-xs md:max-w-md px-4 py-3 rounded-lg ${
+                      className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-md ${
                         msg.role === 'user'
-                          ? 'bg-accent/30'
-                          : 'bg-white shadow-soft'
+                          ? 'bg-gradient-to-br from-green-600 to-green-700 text-white'
+                          : 'bg-white border border-gray-200 text-gray-900'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      <p className="text-xs text-text/50 mt-1">
+                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className={`text-xs mt-2 ${msg.role === 'user' ? 'text-green-100' : 'text-gray-400'}`}>
                         {msg.timestamp.toLocaleTimeString()}
                       </p>
                     </div>
@@ -254,61 +506,103 @@ export default function ChatPage() {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white shadow-soft px-4 py-3 rounded-lg">
+                    <div className="bg-white border border-gray-200 rounded-2xl px-6 py-4">
                       <div className="flex space-x-2">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
+                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce delay-100" />
+                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce delay-200" />
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
+                <div ref={messagesEndRef} />
+              </>
             )}
           </div>
+        </div>
 
-          {/* Chat Input */}
-          <div className="flex gap-2">
-            <button
-              onClick={toggleVoiceInput}
-              className={`px-4 py-3 rounded-full transition-all ${
-                isListening 
-                  ? 'bg-red-500 text-white animate-pulse' 
-                  : 'bg-white text-primary border border-primary/20 hover:bg-primary/5'
-              }`}
-              title={language === 'hi' ? 'आवाज से बोलें' : 'Voice Input'}
-            >
-              {isListening ? '🎤' : '🎙️'}
-            </button>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder={language === 'hi' ? 'अपना सवाल पूछें...' : 'Ask your question...'}
-              className="flex-1 px-4 py-3 rounded-full border border-primary/20 focus:outline-none focus:border-primary"
-              disabled={isLoading}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={isLoading || !input.trim()}
-              className="px-6 py-3 bg-primary text-white rounded-full hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {language === 'hi' ? 'भेजें' : 'Send'}
-            </button>
-          </div>
-
-          <div className="mt-4 text-center text-sm text-text/50">
-            <p>
+        {/* Input Area */}
+        <div className="bg-white border-t p-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex gap-3 items-end">
+              <button
+                onClick={toggleVoiceInput}
+                className={`p-3 rounded-xl transition-all ${
+                  isListening 
+                    ? 'bg-red-500 text-white animate-pulse' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                title={language === 'hi' ? 'आवाज से बोलें' : 'Voice Input'}
+              >
+                <Mic className="w-5 h-5" />
+              </button>
+              
+              <div className="flex-1 relative">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  placeholder={language === 'hi' ? 'अपना सवाल पूछें...' : 'Ask your question...'}
+                  className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-green-500 resize-none"
+                  rows={1}
+                  disabled={isLoading}
+                />
+              </div>
+              
+              <button
+                onClick={sendMessage}
+                disabled={isLoading || !input.trim()}
+                className="p-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 text-center mt-2">
               {language === 'hi'
-                ? '💡 टिप: आप माइक बटन दबाकर बोल सकते हैं या टाइप कर सकते हैं'
-                : '💡 Tip: You can speak using the mic button or type your question'}
+                ? 'कृषिमित्र AI गलतियाँ कर सकती है। महत्वपूर्ण जानकारी की पुष्टि करें।'
+                : 'KrishiMitra AI can make mistakes. Verify important information.'}
             </p>
           </div>
         </div>
-      </main>
+      </div>
 
-      <Footer />
+      {/* Language Modal */}
+      {showLanguageModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Select Language</h2>
+              <button
+                onClick={() => setShowLanguageModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className={`p-4 rounded-xl text-center transition-all ${
+                    language === lang.code
+                      ? 'bg-green-600 text-white shadow-lg transform scale-105'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                  }`}
+                >
+                  <div className="font-semibold text-lg">{lang.name}</div>
+                  <div className="text-sm opacity-75">{lang.nameEn}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

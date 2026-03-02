@@ -13,7 +13,7 @@ export default function AuthPage() {
     email: '',
     phone: '',
     password: '',
-    language: 'hi' as 'hi' | 'en',
+    language: 'hi' as string,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,16 +23,22 @@ export default function AuthPage() {
 
     // Simulate authentication (replace with actual API call)
     setTimeout(() => {
-      // Store user session (in real app, use JWT tokens)
-      localStorage.setItem('user', JSON.stringify({
+      // Store user session
+      const userData = {
+        name: formData.name || formData.email.split('@')[0],
         email: formData.email,
-        name: formData.name,
-        language: formData.language,
-      }));
+        language: formData.language
+      };
+      
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userName', userData.name);
+      localStorage.setItem('userEmail', formData.email);
+      localStorage.setItem('userLanguage', formData.language);
       
       setIsSubmitting(false);
-      // Redirect to chat
-      router.push('/chat');
+      // Redirect to dashboard
+      router.push('/dashboard/farmer');
     }, 1000);
   };
 
@@ -154,33 +160,27 @@ export default function AuthPage() {
 
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
-                    Preferred Language
+                  <label className="block text-sm font-medium text-text mb-2">
+                    Preferred Language / भाषा चुनें
                   </label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, language: 'hi' })}
-                      className={`flex-1 px-4 py-2 rounded-full text-sm transition-all ${
-                        formData.language === 'hi'
-                          ? 'bg-primary text-white'
-                          : 'bg-white text-primary border border-primary/20'
-                      }`}
-                    >
-                      हिंदी
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, language: 'en' })}
-                      className={`flex-1 px-4 py-2 rounded-full text-sm transition-all ${
-                        formData.language === 'en'
-                          ? 'bg-primary text-white'
-                          : 'bg-white text-primary border border-primary/20'
-                      }`}
-                    >
-                      English
-                    </button>
-                  </div>
+                  <select
+                    value={formData.language}
+                    onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border border-primary/20 focus:outline-none focus:border-primary bg-white"
+                  >
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="en">English</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                    <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                    <option value="as">অসমীয়া (Assamese)</option>
+                  </select>
                 </div>
               )}
 

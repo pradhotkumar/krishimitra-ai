@@ -1,239 +1,573 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { 
+  Sparkles, 
+  Phone, 
+  MessageSquare, 
+  Cloud, 
+  TrendingUp,
+  Shield,
+  Zap,
+  Users,
+  CheckCircle
+} from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WeatherDashboard from '@/components/WeatherDashboard';
 import MandiDashboard from '@/components/MandiDashboard';
 
 export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    if (isAuthenticated === 'true') {
+      router.push('/dashboard/farmer');
+    }
+  }, [router]);
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
+
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/10 -z-10" />
-          <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-primary mb-6">
-              🌾 KrishiMitra AI
-            </h1>
-            <p className="text-2xl md:text-3xl text-text/80 mb-4">
-              AI-Powered Agricultural Assistant
-            </p>
-            <p className="text-lg text-text/60 mb-8 max-w-2xl mx-auto">
-              Get instant crop guidance, weather intelligence, government schemes information,
-              and market insights powered by advanced AI technology.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/auth"
-                className="px-8 py-4 bg-primary text-white rounded-full text-lg font-semibold hover:scale-105 transition-transform shadow-soft"
-              >
-                Start Chatting →
-              </Link>
-              <button className="px-8 py-4 bg-white text-primary rounded-full text-lg font-semibold hover:scale-105 transition-transform shadow-soft">
-                Watch Demo
-              </button>
-            </div>
+        {/* Hero Section with Background Image */}
+        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+              alt="Indian farmer in field"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-green-800/85 to-green-900/90" />
           </div>
+
+          {/* Floating Orb Animation */}
+          <motion.div
+            className="absolute top-20 right-20 w-64 h-64 bg-green-400/20 rounded-full blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+
+          {/* Hero Content */}
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <motion.div
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Sparkles className="w-4 h-4 text-green-300" />
+                <span className="text-white text-sm font-medium">AI-Powered Agriculture Platform</span>
+              </motion.div>
+
+              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                <span className="block">KrishiMitra AI</span>
+                <span className="block text-green-300 mt-2">Your Smart Farming Partner</span>
+              </h1>
+
+              <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Get instant crop guidance, weather intelligence, market insights, and government schemes 
+                information powered by advanced AI technology
+              </p>
+
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Link
+                  href="/auth"
+                  className="group px-8 py-4 bg-white text-green-700 rounded-full text-lg font-semibold hover:bg-green-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center gap-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  Start Chatting
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+                <Link
+                  href="/voice-helpline"
+                  className="px-8 py-4 bg-green-600/20 backdrop-blur-sm text-white rounded-full text-lg font-semibold hover:bg-green-600/30 transition-all border-2 border-white/30 hover:border-white/50 hover:scale-105 inline-flex items-center gap-2"
+                >
+                  <Phone className="w-5 h-5" />
+                  Voice Helpline
+                </Link>
+              </motion.div>
+
+              {/* Trust Indicators */}
+              <motion.div
+                className="mt-12 flex flex-wrap justify-center gap-8 text-white/80"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span>24/7 Available</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span>12 Indian Languages</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span>Powered by AWS</span>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+              <motion.div
+                className="w-1.5 h-1.5 bg-white rounded-full mt-2"
+                animate={{ y: [0, 16, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </div>
+          </motion.div>
         </section>
 
-        {/* Trust Strip */}
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-3xl mb-2">🤖</div>
-                <h3 className="font-semibold text-primary mb-1">24x7 AI Support</h3>
-                <p className="text-sm text-text/60">Always available</p>
-              </div>
-              <div>
-                <div className="text-3xl mb-2">⚡</div>
-                <h3 className="font-semibold text-primary mb-1">Real-time Insights</h3>
-                <p className="text-sm text-text/60">Instant responses</p>
-              </div>
-              <div>
-                <div className="text-3xl mb-2">🔒</div>
-                <h3 className="font-semibold text-primary mb-1">Secure AWS Infrastructure</h3>
-                <p className="text-sm text-text/60">Enterprise-grade</p>
-              </div>
-              <div>
-                <div className="text-3xl mb-2">📈</div>
-                <h3 className="font-semibold text-primary mb-1">Serverless & Scalable</h3>
-                <p className="text-sm text-text/60">Handles any load</p>
-              </div>
-            </div>
+        {/* Features Grid with Images */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-green-50">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Everything You Need for Smart Farming
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Comprehensive AI-powered tools to help you make better farming decisions
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {/* Feature Card 1 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&q=80"
+                    alt="AI Chat Assistant"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <MessageSquare className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">AI Chat Assistant</h3>
+                  <p className="text-gray-600 mb-4">
+                    Get instant answers to your farming questions in 12 Indian languages. 
+                    Available 24/7 with expert AI guidance.
+                  </p>
+                  <Link
+                    href="/chat"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    Start Chatting
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Feature Card 2 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80"
+                    alt="Weather Intelligence"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <Cloud className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Weather Intelligence</h3>
+                  <p className="text-gray-600 mb-4">
+                    Real-time weather forecasts, alerts, and AI-powered recommendations 
+                    for optimal farming decisions.
+                  </p>
+                  <a
+                    href="#weather"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    View Weather
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Feature Card 3 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=600&q=80"
+                    alt="Market Prices"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Live Market Prices</h3>
+                  <p className="text-gray-600 mb-4">
+                    Get real-time mandi prices, market trends, and sell your produce 
+                    at the best rates.
+                  </p>
+                  <Link
+                    href="/marketplace"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    View Marketplace
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Feature Card 4 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600&q=80"
+                    alt="Voice Helpline"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <Phone className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Voice Helpline</h3>
+                  <p className="text-gray-600 mb-4">
+                    Call our toll-free number and speak in Hindi. No internet or 
+                    smartphone needed.
+                  </p>
+                  <Link
+                    href="/voice-helpline"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    Learn More
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Feature Card 5 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&q=80"
+                    alt="Crop Guidance"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Crop Guidance</h3>
+                  <p className="text-gray-600 mb-4">
+                    Expert advice on crop selection, sowing, irrigation, and pest 
+                    management powered by AI.
+                  </p>
+                  <Link
+                    href="/auth"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    Get Started
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Feature Card 6 */}
+              <motion.div
+                variants={fadeInUp}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80"
+                    alt="Government Schemes"
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Government Schemes</h3>
+                  <p className="text-gray-600 mb-4">
+                    Find and apply for government schemes, subsidies, and benefits 
+                    available for farmers.
+                  </p>
+                  <Link
+                    href="/auth"
+                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
+                  >
+                    Explore Schemes
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
         {/* Real-Time Weather Intelligence */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <section id="weather" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center text-primary mb-12">
-              Real-Time Weather Intelligence
-            </h2>
-            <WeatherDashboard />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Real-Time Weather Intelligence
+              </h2>
+              <p className="text-xl text-gray-600">
+                Accurate weather forecasts to plan your farming activities
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <WeatherDashboard />
+            </motion.div>
           </div>
         </section>
 
         {/* Real-Time Mandi Prices */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-primary/5">
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-green-50 to-white">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center text-primary mb-12">
-              Live Mandi Prices
-            </h2>
-            <MandiDashboard />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Live Mandi Prices
+              </h2>
+              <p className="text-xl text-gray-600">
+                Get the latest market prices from mandis across India
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <MandiDashboard />
+            </motion.div>
           </div>
         </section>
 
-        {/* Voice Helpline Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-primary/5">
+        {/* Trust Section with Stats */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-green-700 text-white">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-bold text-primary mb-6">
-                  Voice Helpline Integration
-                </h2>
-                <p className="text-lg text-text/70 mb-6">
-                  Can't use the web? No problem! Call our voice helpline and speak in Hindi
-                  to get the same AI-powered assistance over the phone.
-                </p>
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">✓</span>
-                    <span>Works on basic mobile phones</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">✓</span>
-                    <span>No internet required</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">✓</span>
-                    <span>Hindi language support</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">✓</span>
-                    <span>Available 24/7</span>
-                  </li>
-                </ul>
-                <button className="px-8 py-4 bg-primary text-white rounded-full text-lg font-semibold hover:scale-105 transition-transform shadow-soft">
-                  📞 Call Now
-                </button>
-              </div>
-              <div className="glass p-8 rounded-lg shadow-soft">
-                <div className="text-6xl text-center mb-4">📱</div>
-                <p className="text-center text-text/70">
-                  Voice helpline powered by Amazon Connect, Transcribe, Lex, and Polly
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Trusted by Farmers Across India
+              </h2>
+              <p className="text-xl text-green-100">
+                Join thousands of farmers using AI to improve their yields
+              </p>
+            </motion.div>
 
-        {/* Chat Preview Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center text-primary mb-12">
-              Try Our AI Chat Assistant
-            </h2>
-            <div className="max-w-3xl mx-auto glass p-8 rounded-lg shadow-soft">
-              <div className="mb-6">
-                <div className="flex gap-2 mb-4">
-                  <button className="px-4 py-2 bg-primary text-white rounded-full text-sm">
-                    हिंदी
-                  </button>
-                  <button className="px-4 py-2 bg-white text-primary rounded-full text-sm border border-primary/20">
-                    English
-                  </button>
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-8"
+            >
+              <motion.div variants={fadeInUp} className="text-center">
+                <div className="text-5xl font-bold mb-2">24/7</div>
+                <div className="text-green-100">AI Support</div>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="text-center">
+                <div className="text-5xl font-bold mb-2">12</div>
+                <div className="text-green-100">Languages</div>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="text-center">
+                <div className="text-5xl font-bold mb-2">100%</div>
+                <div className="text-green-100">Free to Use</div>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="text-center">
+                <div className="text-5xl font-bold mb-2">
+                  <Zap className="w-12 h-12 mx-auto" />
                 </div>
-                <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                  <div className="flex justify-end">
-                    <div className="bg-accent/30 px-4 py-2 rounded-lg max-w-xs">
-                      <p className="text-sm">गेहूं की खेती के बारे में बताएं</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-start">
-                    <div className="bg-white px-4 py-2 rounded-lg max-w-xs shadow-soft">
-                      <p className="text-sm">
-                        गेहूं की खेती के लिए अक्टूबर-नवंबर सबसे अच्छा समय है...
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="अपना सवाल पूछें..."
-                  className="flex-1 px-4 py-3 rounded-full border border-primary/20 focus:outline-none focus:border-primary"
-                  disabled
-                />
-                <button className="px-6 py-3 bg-primary text-white rounded-full hover:scale-105 transition-transform">
-                  भेजें
-                </button>
-              </div>
-              <div className="mt-6 text-center">
-                <Link
-                  href="/auth"
-                  className="text-primary hover:underline font-semibold"
-                >
-                  Sign In to Start Chatting →
-                </Link>
-              </div>
-            </div>
+                <div className="text-green-100">Instant Answers</div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
         {/* AWS Architecture Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-primary/5">
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center text-primary mb-12">
-              Built on AWS Cloud
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">🧠</div>
-                <h3 className="font-semibold text-primary mb-1">Amazon Bedrock</h3>
-                <p className="text-xs text-text/60">AI Foundation Models</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">⚡</div>
-                <h3 className="font-semibold text-primary mb-1">AWS Lambda</h3>
-                <p className="text-xs text-text/60">Serverless Compute</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">🔌</div>
-                <h3 className="font-semibold text-primary mb-1">API Gateway</h3>
-                <p className="text-xs text-text/60">RESTful APIs</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">💾</div>
-                <h3 className="font-semibold text-primary mb-1">DynamoDB</h3>
-                <p className="text-xs text-text/60">NoSQL Database</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">📦</div>
-                <h3 className="font-semibold text-primary mb-1">Amazon S3</h3>
-                <p className="text-xs text-text/60">Object Storage</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">📞</div>
-                <h3 className="font-semibold text-primary mb-1">Amazon Connect</h3>
-                <p className="text-xs text-text/60">Cloud Contact Center</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">🗣️</div>
-                <h3 className="font-semibold text-primary mb-1">Amazon Lex</h3>
-                <p className="text-xs text-text/60">Conversational AI</p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-soft text-center">
-                <div className="text-3xl mb-2">🚀</div>
-                <h3 className="font-semibold text-primary mb-1">AWS Amplify</h3>
-                <p className="text-xs text-text/60">Web Hosting</p>
-              </div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Built on Enterprise-Grade AWS Cloud
+              </h2>
+              <p className="text-xl text-gray-600">
+                Secure, scalable, and reliable infrastructure
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-6"
+            >
+              {[
+                { icon: '🧠', name: 'Amazon Bedrock', desc: 'AI Models' },
+                { icon: '⚡', name: 'AWS Lambda', desc: 'Serverless' },
+                { icon: '🔌', name: 'API Gateway', desc: 'RESTful APIs' },
+                { icon: '💾', name: 'DynamoDB', desc: 'Database' },
+                { icon: '📦', name: 'Amazon S3', desc: 'Storage' },
+                { icon: '📞', name: 'Amazon Connect', desc: 'Voice Calls' },
+                { icon: '🗣️', name: 'Amazon Lex', desc: 'Chatbot' },
+                { icon: '🚀', name: 'AWS Amplify', desc: 'Hosting' },
+              ].map((service, index) => (
+                <motion.div
+                  key={index}
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all text-center"
+                >
+                  <div className="text-4xl mb-3">{service.icon}</div>
+                  <h3 className="font-bold text-gray-900 mb-1">{service.name}</h3>
+                  <p className="text-sm text-gray-600">{service.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-600 to-green-800 text-white">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Ready to Transform Your Farming?
+              </h2>
+              <p className="text-xl text-green-100 mb-8">
+                Join thousands of farmers using AI to make smarter decisions
+              </p>
+              <Link
+                href="/auth"
+                className="inline-block px-10 py-5 bg-white text-green-700 rounded-full text-xl font-bold hover:bg-green-50 transition-all shadow-2xl hover:scale-105"
+              >
+                Get Started Free →
+              </Link>
+            </motion.div>
           </div>
         </section>
       </main>

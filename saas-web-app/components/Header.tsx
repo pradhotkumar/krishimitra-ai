@@ -1,10 +1,31 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { User, LogOut } from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUserName] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check authentication status
+    const authStatus = localStorage.getItem('isAuthenticated');
+    const storedName = localStorage.getItem('userName') || 'Farmer';
+    setIsAuthenticated(authStatus === 'true');
+    setUserName(storedName);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('isAdmin');
+    setIsAuthenticated(false);
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-primary/10">
@@ -22,8 +43,19 @@ export default function Header() {
               Home
             </Link>
             <Link href="/chat" className="text-text hover:text-primary transition-colors">
-              Chat
+              AI Chat
             </Link>
+            <Link href="/voice-helpline" className="text-text hover:text-primary transition-colors">
+              Voice Helpline
+            </Link>
+            <Link href="/marketplace" className="text-text hover:text-primary transition-colors">
+              Marketplace
+            </Link>
+            {isAuthenticated && (
+              <Link href="/dashboard/farmer" className="text-text hover:text-primary transition-colors">
+                Dashboard
+              </Link>
+            )}
             <Link href="/about" className="text-text hover:text-primary transition-colors">
               About
             </Link>
@@ -32,13 +64,29 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* CTA Button */}
-          <Link
-            href="/auth"
-            className="hidden md:block px-6 py-2 bg-primary text-white rounded-full hover:scale-105 transition-transform"
-          >
-            Sign In
-          </Link>
+          {/* Auth Section */}
+          {isAuthenticated ? (
+            <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm">
+                <User className="w-4 h-4" />
+                <span>{userName}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth"
+              className="hidden md:block px-6 py-2 bg-primary text-white rounded-full hover:scale-105 transition-transform"
+            >
+              Sign In
+            </Link>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -86,8 +134,31 @@ export default function Header() {
               className="block text-text hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Chat
+              AI Chat
             </Link>
+            <Link
+              href="/voice-helpline"
+              className="block text-text hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Voice Helpline
+            </Link>
+            <Link
+              href="/marketplace"
+              className="block text-text hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Marketplace
+            </Link>
+            {isAuthenticated && (
+              <Link
+                href="/dashboard/farmer"
+                className="block text-text hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+            )}
             <Link
               href="/about"
               className="block text-text hover:text-primary transition-colors"
@@ -102,13 +173,25 @@ export default function Header() {
             >
               Contact
             </Link>
-            <Link
-              href="/auth"
-              className="block w-full text-center px-6 py-2 bg-primary text-white rounded-full"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Sign In
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full text-left text-red-600 hover:text-red-700"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/auth"
+                className="block w-full text-center px-6 py-2 bg-primary text-white rounded-full"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         )}
       </div>
