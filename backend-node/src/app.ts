@@ -12,7 +12,7 @@ import chatRoutes from './routes/chatRoutes';
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
 import adminRoutes from './routes/adminRoutes';
-import weatherRoutes from "./routes/weatherRoutes";
+// import weatherRoutes from "./routes/weatherRoutes"; // Removed - not needed
 
 
 const app = express();
@@ -68,7 +68,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', weatherRoutes);
+// app.use('/api', weatherRoutes); // Removed - not needed
 
 // 404 handler
 app.use(notFoundHandler);
