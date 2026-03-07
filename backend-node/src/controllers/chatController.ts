@@ -32,6 +32,36 @@ export class ChatController {
   }
 
   /**
+   * Public chat endpoint - No authentication required
+   * For anonymous users to test the AI
+   */
+  async sendPublicMessage(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { message, userId } = req.body;
+
+      // Validate message
+      if (!message || typeof message !== 'string') {
+        res.status(400).json({
+          success: false,
+          message: 'Please provide a valid message',
+        });
+        return;
+      }
+
+      // Use provided userId or generate anonymous one
+      const effectiveUserId = userId || `anonymous_${Date.now()}`;
+
+      // Process through BhoomiEngine
+      const bhoomiResponse = await bhoomiEngine.processWebChat(message, effectiveUserId);
+
+      // Return comprehensive response
+      res.status(200).json(bhoomiResponse);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Get chat history for authenticated user
    */
   async getChatHistory(req: AuthRequest, res: Response, next: NextFunction) {

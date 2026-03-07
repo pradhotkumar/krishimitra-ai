@@ -10,6 +10,14 @@ const router = Router();
 // Health check endpoint (no auth required)
 router.get('/health', chatController.healthCheck);
 
+// Public chat endpoint (no auth required)
+router.post(
+  '/public',
+  chatLimiter,
+  validate(chatMessageSchema),
+  chatController.sendPublicMessage
+);
+
 // All other chat routes require authentication
 router.use(authenticate);
 
