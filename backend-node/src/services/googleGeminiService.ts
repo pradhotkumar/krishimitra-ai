@@ -17,9 +17,14 @@ export class GoogleGeminiService {
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
-    this.apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    // Use v1 API instead of v1beta
+    this.apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
     
-    console.log('✅ Google Gemini Service initialized');
+    if (!this.apiKey) {
+      console.error('❌ GEMINI_API_KEY is missing!');
+    } else {
+      console.log('✅ Google Gemini Service initialized');
+    }
   }
 
   /**
