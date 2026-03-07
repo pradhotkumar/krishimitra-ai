@@ -42,27 +42,40 @@ export class GoogleGeminiService {
       console.log('🤖 Calling Gemini:', {
         userId,
         classification,
-        inputLength: userInput.length
+        inputLength: userInput.length,
+        apiUrl: this.apiUrl,
+        hasApiKey: !!this.apiKey,
+        promptLength: fullPrompt.length
       });
+
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: fullPrompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      };
+
+      console.log('📤 Gemini request body:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch(`${this.apiUrl}?key=${this.apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: fullPrompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          }
-        })
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('📥 Gemini response status:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
       if (!response.ok) {
@@ -70,17 +83,21 @@ export class GoogleGeminiService {
         console.error('❌ Gemini API HTTP error:', {
           status: response.status,
           statusText: response.statusText,
-          error: errorText
+          error: errorText,
+          fullUrl: `${this.apiUrl}?key=${this.apiKey.substring(0, 10)}...`
         });
         throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
       }
 
       const data: any = await response.json();
+      console.log('📦 Gemini raw response:', JSON.stringify(data, null, 2));
+
       const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate response.';
 
       console.log('✅ Gemini response received:', {
         userId,
-        responseLength: aiMessage.length
+        responseLength: aiMessage.length,
+        preview: aiMessage.substring(0, 100)
       });
 
       return {
