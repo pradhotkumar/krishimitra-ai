@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -40,7 +40,6 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      // Redirect to login with return URL
       router.push(`/auth?redirect=/marketplace`);
       return;
     }
@@ -59,87 +58,88 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
   };
 
   return (
-    <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden border border-gray-100">
-      <Link href={`/marketplace/${product.id}`}>
-        <div className="relative h-56 bg-gray-100 overflow-hidden">
-          {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-200 animate-pulse" />
-          )}
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className={`object-cover transition-all duration-500 ${
-              imageLoaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0'
+    <div className="group glass-tier-1 rounded-2xl glass-specular p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.35)] card-hover relative flex flex-col z-20">
+      <Link href={`/marketplace/${product.id}`} className="block relative h-52 overflow-hidden rounded-[14px] glass-tier-2 shadow-inner">
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-white/5 animate-pulse" />
+        )}
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className={`object-cover transition-all duration-700 ease-in-out ${imageLoaded ? 'opacity-90 group-hover:scale-105 group-hover:opacity-100' : 'opacity-0'
             }`}
-            onLoad={() => setImageLoaded(true)}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          
-          {/* Badges */}
-          <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
-            {product.aiRecommended && (
-              <AIBadge size="sm" variant="compact" />
-            )}
-            <button
-              onClick={handleWishlist}
-              className="ml-auto bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-colors shadow-md"
-            >
-              <Heart
-                className={`w-4 h-4 transition-colors ${
-                  isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-600'
-                }`}
-              />
-            </button>
-          </div>
+          onLoad={() => setImageLoaded(true)}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
 
-          {/* Stock Status */}
-          {!product.inStock && (
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-              <span className="text-white font-semibold text-lg">Out of Stock</span>
+        {/* Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-start justify-between z-10">
+          {product.aiRecommended && (
+            <div className="glass-tier-3 rounded-pill glass-specular scale-90 origin-top-left">
+              <AIBadge size="sm" variant="compact" />
             </div>
           )}
+          <button
+            onClick={handleWishlist}
+            className="ml-auto glass-tier-3 p-2 rounded-full interactive-glass focus:outline-none apple-focus glass-specular text-text-primary"
+          >
+            <Heart
+              className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-glassTint-pink text-glassTint-pink drop-shadow-[0_0_8px_rgba(255,55,95,0.6)]' : 'text-text-primary'
+                }`}
+            />
+          </button>
+        </div>
 
-          {/* Quick View */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium text-gray-800">
-              <Eye className="w-4 h-4" />
-              Quick View
-            </div>
+        {/* Stock Status */}
+        {!product.inStock && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[8px] flex items-center justify-center z-20">
+            <span className="text-text-primary font-semibold text-lg drop-shadow-md">Out of Stock</span>
+          </div>
+        )}
+
+        {/* Quick View */}
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-center justify-center z-10 pointer-events-none">
+          <div className="glass-tier-3 px-5 py-2.5 rounded-pill flex items-center gap-2 text-sm font-medium text-text-primary glass-specular transform translate-y-4 group-hover:translate-y-0 transition-transform duration-400">
+            <Eye className="w-4 h-4" />
+            Quick View
           </div>
         </div>
       </Link>
 
-      <div className="p-4">
-        <Link href={`/marketplace/${product.id}`}>
-          <div className="mb-2">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+      <div className="p-4 flex-1 flex flex-col justify-between relative z-20">
+        <div>
+          <Link href={`/marketplace/${product.id}`} className="block mb-2 group-hover:text-glassTint-mint transition-colors">
+            <p className="text-label text-text-tertiary mb-1">
               {product.category}
             </p>
-            <h3 className="font-semibold text-base text-gray-800 line-clamp-2 group-hover:text-green-600 transition-colors min-h-[3rem]">
+            <h3 className="font-semibold text-base text-text-primary leading-tight min-h-[2.5rem] tracking-tight text-vibrancy">
               {product.name}
             </h3>
+          </Link>
+
+          <div className="mb-4">
+            <StarRating rating={product.rating} reviews={product.reviews} size="sm" />
           </div>
-        </Link>
 
-        <div className="mb-3">
-          <StarRating rating={product.rating} reviews={product.reviews} size="sm" />
-        </div>
-
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-green-600">₹{product.price}</span>
-              <span className="text-sm text-gray-500">/{product.unit}</span>
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-text-primary text-vibrancy">₹{product.price}</span>
+                <span className="text-sm text-text-tertiary">/{product.unit}</span>
+              </div>
+              <p className="text-xs text-text-tertiary mt-1 font-medium">by <span className="text-text-secondary">{product.seller}</span></p>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">by {product.seller}</p>
           </div>
         </div>
 
         <button
           onClick={handleAddToCart}
           disabled={!product.inStock}
-          className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2.5 rounded-xl hover:shadow-lg transition-all duration-300 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2 group-hover:scale-[1.02]"
+          className={`w-full py-3 rounded-pill font-semibold flex items-center justify-center gap-2 interactive-glass transition-all focus:outline-none apple-focus ${product.inStock
+              ? 'glass-tier-2 bg-glassTint-blue/20 text-text-primary glass-specular hover:bg-glassTint-blue/40 text-vibrancy'
+              : 'glass-tier-1 text-text-secondary opacity-50 cursor-not-allowed'
+            }`}
         >
           <ShoppingCart className="w-4 h-4" />
           {product.inStock ? 'Add to Cart' : 'Out of Stock'}

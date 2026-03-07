@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 
@@ -14,7 +14,7 @@ interface MandiPrice {
 }
 
 const indianStates = [
-  'Andhra Pradesh', 'Bihar', 'Gujarat', 'Haryana', 'Karnataka', 
+  'Andhra Pradesh', 'Bihar', 'Gujarat', 'Haryana', 'Karnataka',
   'Madhya Pradesh', 'Maharashtra', 'Punjab', 'Rajasthan', 'Tamil Nadu',
   'Telangana', 'Uttar Pradesh', 'West Bengal'
 ];
@@ -54,12 +54,12 @@ export default function MandiDashboard() {
   return (
     <div className="space-y-6">
       {/* State Selector */}
-      <div className="glass p-6 rounded-lg shadow-soft">
-        <div className="flex gap-3">
+      <div className="glass-tier-1 p-6 rounded-2xl glass-specular shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative z-20 delay-1 animate-glass-reveal opacity-0">
+        <div className="flex flex-col sm:flex-row gap-3">
           <select
             value={state}
             onChange={(e) => setState(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-full border border-primary/20 focus:outline-none focus:border-primary bg-white"
+            className="flex-1 px-5 py-3 rounded-pill glass-tier-1 text-text-primary focus:outline-none apple-focus appearance-none interactive-glass [&>option]:bg-[#10121f] [&>option]:text-white"
           >
             <option value="">Select State</option>
             {indianStates.map((s) => (
@@ -69,53 +69,60 @@ export default function MandiDashboard() {
           <button
             onClick={fetchPrices}
             disabled={loading || !state}
-            className="px-8 py-3 bg-primary text-white rounded-full hover:scale-105 transition-transform disabled:opacity-50"
+            className="px-8 py-3 glass-tier-2 bg-glassTint-mint/20 text-white font-semibold rounded-pill interactive-glass glass-specular disabled:opacity-50 text-vibrancy apple-focus"
           >
             {loading ? 'Loading...' : 'Get Prices'}
           </button>
         </div>
         {error && (
-          <p className="mt-3 text-sm text-red-600">{error}</p>
+          <p className="mt-3 text-sm text-glassTint-pink font-medium pl-4">{error}</p>
         )}
       </div>
 
       {/* Prices Table */}
       {prices.length > 0 && (
-        <div className="glass p-8 rounded-lg shadow-soft overflow-x-auto">
-          <h3 className="text-2xl font-bold text-primary mb-6">
+        <div className="glass-tier-1 p-8 rounded-2xl glass-specular shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative z-20 overflow-hidden delay-2 animate-glass-reveal opacity-0">
+          <h3 className="text-2xl font-bold text-text-primary text-vibrancy mb-6 tracking-tight">
             Market Prices - {state}
           </h3>
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-primary/20">
-                <th className="text-left py-3 px-4 text-primary font-semibold">Commodity</th>
-                <th className="text-left py-3 px-4 text-primary font-semibold">Market</th>
-                <th className="text-right py-3 px-4 text-primary font-semibold">Min Price</th>
-                <th className="text-right py-3 px-4 text-primary font-semibold">Max Price</th>
-                <th className="text-right py-3 px-4 text-primary font-semibold">Modal Price</th>
-                <th className="text-right py-3 px-4 text-primary font-semibold">Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {prices.map((price, index) => (
-                <tr key={index} className="border-b border-primary/10 hover:bg-primary/5">
-                  <td className="py-3 px-4 font-medium">{price.commodity}</td>
-                  <td className="py-3 px-4 text-text/70">{price.market}</td>
-                  <td className="py-3 px-4 text-right">₹{price.minPrice}</td>
-                  <td className="py-3 px-4 text-right">₹{price.maxPrice}</td>
-                  <td className="py-3 px-4 text-right font-semibold text-primary">
-                    ₹{price.modalPrice}
-                  </td>
-                  <td className="py-3 px-4 text-right text-sm text-text/60">
-                    {price.lastUpdated}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/20">
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase">Commodity</th>
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase">Market</th>
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase text-right">Min Price</th>
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase text-right">Max Price</th>
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase text-right">Modal Price</th>
+                  <th className="py-4 px-4 text-text-secondary font-semibold text-sm tracking-wide uppercase text-right">Updated</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="mt-4 text-xs text-text/50 text-center">
-            Prices are in ₹ per quintal (100 kg). Data source: data.gov.in
-          </p>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {prices.map((price, index) => (
+                  <tr key={index} className="hover:bg-white/5 transition-colors group">
+                    <td className="py-4 px-4 font-semibold text-text-primary flex items-center gap-2 group-hover:text-vibrancy">
+                      <div className="w-2 h-2 rounded-full bg-glassTint-mint/80"></div>
+                      {price.commodity}
+                    </td>
+                    <td className="py-4 px-4 text-text-secondary">{price.market}</td>
+                    <td className="py-4 px-4 text-right text-text-primary">₹{price.minPrice}</td>
+                    <td className="py-4 px-4 text-right text-text-primary">₹{price.maxPrice}</td>
+                    <td className="py-4 px-4 text-right font-bold text-text-primary text-vibrancy">
+                      ₹{price.modalPrice}
+                    </td>
+                    <td className="py-4 px-4 text-right text-xs font-mono text-text-tertiary">
+                      {price.lastUpdated}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-8 pt-4 border-t border-white/10 text-center">
+            <p className="text-xs text-text-tertiary tracking-widest uppercase font-semibold">
+              Prices are in ₹ per quintal (100 kg) &nbsp;•&nbsp; Source: data.gov.in
+            </p>
+          </div>
         </div>
       )}
     </div>

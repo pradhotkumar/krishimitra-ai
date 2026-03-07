@@ -15,7 +15,8 @@ import {
   Phone,
   Newspaper,
   ExternalLink,
-  FileText
+  FileText,
+  Globe
 } from 'lucide-react';
 
 interface DashboardData {
@@ -56,15 +57,14 @@ export default function FarmerDashboardPage() {
   const [userName, setUserName] = useState('Farmer');
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState<Array<{role: string, message: string}>>([]);
+  const [chatHistory, setChatHistory] = useState<Array<{ role: string, message: string }>>([]);
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
 
   useEffect(() => {
-    // Check authentication and get user name
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const storedName = localStorage.getItem('userName');
     const storedLanguage = localStorage.getItem('language') as 'en' | 'hi';
-    
+
     if (!isAuthenticated) {
       router.push('/auth?redirect=/dashboard/farmer');
       return;
@@ -178,14 +178,12 @@ export default function FarmerDashboardPage() {
     e.preventDefault();
     if (!chatMessage.trim()) return;
 
-    // Add user message
     setChatHistory(prev => [...prev, { role: 'user', message: chatMessage }]);
-    
-    // Simulate AI response (replace with actual API call)
+
     setTimeout(() => {
-      setChatHistory(prev => [...prev, { 
-        role: 'assistant', 
-        message: 'Hello! I\'m Bhoomi, your AI farming assistant. For detailed conversations, please visit the AI Chat page. How can I help you quickly?' 
+      setChatHistory(prev => [...prev, {
+        role: 'assistant',
+        message: 'Hello! I\'m Bhoomi, your AI farming assistant. For detailed conversations, please visit the AI Chat page. How can I help you quickly?'
       }]);
     }, 500);
 
@@ -194,44 +192,46 @@ export default function FarmerDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
+      <div className="min-h-screen w-full relative z-10 flex items-center justify-center">
+        <div className="text-center glass-tier-1 p-12 rounded-[40px] glass-specular">
+          <div className="relative w-16 h-16 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border-[3px] border-white/10" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-text-primary border-t-transparent animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center text-xl animate-pulse">🌾</div>
+          </div>
+          <p className="text-text-primary text-vibrancy font-semibold tracking-wide">Initializing Space</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="min-h-screen w-full relative z-10">
+      {/* Heavy Blur Header */}
+      <div className="glass-tier-3 sticky top-0 z-50 glass-specular border-b border-white/10 shadow-2xl backdrop-blur-3xl pt-safe">
+        <div className="max-w-7xl mx-auto px-4 py-5 md:py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold text-text-primary text-vibrancy tracking-tight">
                 {t[language].dashboard}
               </h1>
-              <p className="text-gray-600 mt-1">
-                {t[language].welcome}, <span className="font-semibold text-green-700">{userName}</span>! 🌾
+              <p className="text-sm text-text-secondary mt-1 tracking-wide font-medium">
+                {t[language].welcome}, <span className="text-text-primary font-bold">{userName}</span> 🌾
               </p>
             </div>
             <div className="flex items-center gap-3">
               {/* Language Toggle */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg hover:border-blue-400 transition-all hover:shadow-md"
+                className="flex items-center gap-2 px-4 py-2 glass-tier-3 rounded-xl interactive-glass text-text-primary border border-white/20 glass-specular shadow-md transition-all apple-focus"
                 title={language === 'en' ? 'Switch to Hindi' : 'अंग्रेजी में बदलें'}
               >
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                </svg>
-                <span className="font-semibold text-blue-700">
+                <Globe className="w-5 h-5 opacity-70" />
+                <span className="font-semibold tracking-wide">
                   {language === 'en' ? 'English' : 'हिंदी'}
                 </span>
               </button>
-              
+
               <button
                 onClick={() => {
                   localStorage.removeItem('isAuthenticated');
@@ -240,7 +240,7 @@ export default function FarmerDashboardPage() {
                   localStorage.removeItem('language');
                   router.push('/');
                 }}
-                className="px-6 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
+                className="px-6 py-2.5 glass-tier-2 hover:bg-red-500/20 text-red-400 rounded-xl interactive-glass transition-all font-semibold uppercase tracking-wider text-xs border border-transparent hover:border-red-500/30 shadow-md apple-focus"
               >
                 {t[language].logout}
               </button>
@@ -249,145 +249,162 @@ export default function FarmerDashboardPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 pb-32">
+        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
           {/* Sidebar Navigation */}
-          <aside className="lg:col-span-1">
-            <nav className="bg-white rounded-xl shadow-lg p-4 space-y-2 border border-green-100">
+          <aside className="lg:col-span-1 h-full">
+            <nav className="glass-tier-2 rounded-[32px] p-4 flex flex-col gap-2 glass-specular border border-white/10 sticky top-32 shadow-2xl h-fit">
               {[
-                { id: 'overview', label: t[language].overview, icon: BarChart3 },
-                { id: 'crops', label: t[language].myCrops, icon: Sprout },
-                { id: 'weather', label: t[language].weatherAlerts, icon: Cloud },
-                { id: 'schemes', label: t[language].govtSchemes, icon: TrendingUp },
-                { id: 'news', label: t[language].agriNews, icon: MessageSquare },
-                { id: 'advice', label: t[language].aiAdviceHistory, icon: MessageSquare },
-                { id: 'products', label: t[language].recommendedProducts, icon: ShoppingBag }
+                { id: 'overview', label: t[language].overview || 'Overview', icon: BarChart3 },
+                { id: 'crops', label: t[language].myCrops || 'My Crops', icon: Sprout },
+                { id: 'weather', label: t[language].weatherAlerts || 'Weather Alerts', icon: Cloud },
+                { id: 'schemes', label: t[language].govtSchemes || 'Govt Schemes', icon: TrendingUp },
+                { id: 'news', label: t[language].agriNews || 'Agri News', icon: Newspaper },
+                { id: 'advice', label: t[language].aiAdviceHistory || 'AI Advice History', icon: MessageSquare },
+                { id: 'products', label: t[language].recommendedProducts || 'Store Recommendations', icon: ShoppingBag }
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    activeTab === item.id
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md transform scale-105'
-                      : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
-                  }`}
+                  className={`w-full flex items-center gap-3.5 px-5 py-3.5 rounded-2xl transition-all font-medium apple-focus outline-none ${activeTab === item.id
+                    ? 'glass-tier-3 text-text-primary glass-specular shadow-lg transform scale-[1.02] border border-white/20'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5 interactive-glass'
+                    }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? 'opacity-100' : 'opacity-60'}`} />
+                  <span className="tracking-wide text-[15px]">{item.label}</span>
                 </button>
               ))}
             </nav>
           </aside>
 
-          {/* Main Content */}
-          <main className="lg:col-span-3">
+          {/* Main Content Area */}
+          <main className="lg:col-span-1 min-w-0">
             {activeTab === 'overview' && (
-              <div className="space-y-6">
+              <div className="space-y-8 animate-glass-reveal">
                 {/* Stats Cards */}
                 <div className="grid md:grid-cols-3 gap-6">
-                  <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                      <Sprout className="w-10 h-10" />
-                      <TrendingUp className="w-6 h-6" />
+                  {/* Card 1 */}
+                  <div className="glass-tier-1 rounded-[32px] p-6 glass-specular overflow-hidden relative group interactive-glass border border-white/10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
+                          <Sprout className="w-6 h-6 text-white" />
+                        </div>
+                        <TrendingUp className="w-5 h-5 text-white/50" />
+                      </div>
+                      <p className="text-text-tertiary text-xs font-bold uppercase tracking-widest">{t[language].activeCrops}</p>
+                      <p className="text-4xl font-bold mt-2 text-text-primary text-vibrancy">
+                        {data?.crops?.length || 3}
+                      </p>
                     </div>
-                    <p className="text-green-100 text-sm">{t[language].activeCrops}</p>
-                    <p className="text-4xl font-bold mt-1">
-                      {data?.crops?.length || 3}
-                    </p>
                   </div>
 
-                  <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                      <AlertTriangle className="w-10 h-10" />
-                      <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                        {t[language].newAlerts}
-                      </span>
+                  {/* Card 2 */}
+                  <div className="glass-tier-1 rounded-[32px] p-6 glass-specular overflow-hidden relative group interactive-glass border border-white/10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
+                          <AlertTriangle className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-[10px] uppercase tracking-widest bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-1 rounded-full font-bold shadow-[0_0_10px_rgba(249,115,22,0.2)]">
+                          {t[language].newAlerts}
+                        </span>
+                      </div>
+                      <p className="text-text-tertiary text-xs font-bold uppercase tracking-widest">{t[language].weatherAlerts}</p>
+                      <p className="text-4xl font-bold mt-2 text-text-primary text-vibrancy">
+                        {data?.weatherAlerts?.length || 3}
+                      </p>
                     </div>
-                    <p className="text-orange-100 text-sm">{t[language].weatherAlerts}</p>
-                    <p className="text-4xl font-bold mt-1">
-                      {data?.weatherAlerts?.length || 3}
-                    </p>
                   </div>
 
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                      <MessageSquare className="w-10 h-10" />
+                  {/* Card 3 */}
+                  <div className="glass-tier-1 rounded-[32px] p-6 glass-specular overflow-hidden relative group interactive-glass border border-white/10">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
+                          <MessageSquare className="w-6 h-6 text-white" />
+                        </div>
+                      </div>
+                      <p className="text-text-tertiary text-xs font-bold uppercase tracking-widest">{t[language].aiConsultations}</p>
+                      <p className="text-4xl font-bold mt-2 text-text-primary text-vibrancy">
+                        {data?.aiAdviceHistory?.length || 3}
+                      </p>
                     </div>
-                    <p className="text-blue-100 text-sm">{t[language].aiConsultations}</p>
-                    <p className="text-4xl font-bold mt-1">
-                      {data?.aiAdviceHistory?.length || 3}
-                    </p>
                   </div>
                 </div>
 
                 {/* Quick Actions */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
-                  <h2 className="font-semibold text-xl mb-4 text-gray-800">{t[language].quickActions}</h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="glass-tier-2 rounded-[36px] p-8 glass-specular border border-white/10 shadow-2xl">
+                  <h2 className="font-bold text-2xl mb-6 text-text-primary tracking-tight">{t[language].quickActions}</h2>
+                  <div className="grid md:grid-cols-4 gap-5">
                     <button
                       onClick={() => router.push('/chat')}
-                      className="flex flex-col items-center gap-3 p-5 border-2 border-green-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all hover:shadow-md"
+                      className="group flex flex-col items-center gap-4 p-6 glass-tier-1 border border-white/5 rounded-[28px] hover:border-white/20 interactive-glass transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] text-center apple-focus"
                     >
-                      <div className="bg-green-100 p-3 rounded-lg">
-                        <MessageSquare className="w-6 h-6 text-green-600" />
+                      <div className="w-14 h-14 bg-white/5 group-hover:bg-white/10 rounded-[20px] flex items-center justify-center transition-colors border border-white/10">
+                        <MessageSquare className="w-6 h-6 text-text-primary" />
                       </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">{t[language].askAIExpert}</p>
-                        <p className="text-xs text-gray-600">{t[language].getFarmingAdvice}</p>
+                      <div>
+                        <p className="font-semibold text-text-primary tracking-wide text-sm">{t[language].askAIExpert}</p>
+                        <p className="text-xs text-text-tertiary mt-1">{t[language].getFarmingAdvice}</p>
                       </div>
                     </button>
 
                     <button
                       onClick={() => router.push('/plant-health')}
-                      className="flex flex-col items-center gap-3 p-5 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md"
+                      className="group flex flex-col items-center gap-4 p-6 glass-tier-2 border border-green-500/30 rounded-[28px] hover:border-green-400/60 interactive-glass transition-all hover:shadow-[0_0_30px_rgba(74,222,128,0.1)] text-center apple-focus glass-specular"
                     >
-                      <div className="bg-blue-100 p-3 rounded-lg">
-                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-14 h-14 bg-green-500/20 group-hover:bg-green-500/30 rounded-[20px] flex items-center justify-center transition-colors border border-green-500/40">
+                        <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                       </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">{t[language].plantCare}</p>
-                        <p className="text-xs text-gray-600">{t[language].scanLeafDiseases}</p>
+                      <div>
+                        <p className="font-semibold text-text-primary tracking-wide text-sm">{t[language].plantCare}</p>
+                        <p className="text-xs text-text-tertiary mt-1">{t[language].scanLeafDiseases}</p>
                       </div>
                     </button>
 
                     <button
                       onClick={() => router.push('/marketplace')}
-                      className="flex flex-col items-center gap-3 p-5 border-2 border-orange-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all hover:shadow-md"
+                      className="group flex flex-col items-center gap-4 p-6 glass-tier-1 border border-white/5 rounded-[28px] hover:border-white/20 interactive-glass transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] text-center apple-focus"
                     >
-                      <div className="bg-orange-100 p-3 rounded-lg">
-                        <ShoppingBag className="w-6 h-6 text-orange-600" />
+                      <div className="w-14 h-14 bg-white/5 group-hover:bg-white/10 rounded-[20px] flex items-center justify-center transition-colors border border-white/10">
+                        <ShoppingBag className="w-6 h-6 text-text-primary" />
                       </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">{t[language].marketplace}</p>
-                        <p className="text-xs text-gray-600">{t[language].buySupplies}</p>
+                      <div>
+                        <p className="font-semibold text-text-primary tracking-wide text-sm">{t[language].marketplace}</p>
+                        <p className="text-xs text-text-tertiary mt-1">{t[language].buySupplies}</p>
                       </div>
                     </button>
 
                     <button
                       onClick={() => setActiveTab('schemes')}
-                      className="flex flex-col items-center gap-3 p-5 border-2 border-purple-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all hover:shadow-md"
+                      className="group flex flex-col items-center gap-4 p-6 glass-tier-1 border border-white/5 rounded-[28px] hover:border-white/20 interactive-glass transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] text-center apple-focus"
                     >
-                      <div className="bg-purple-100 p-3 rounded-lg">
-                        <FileText className="w-6 h-6 text-purple-600" />
+                      <div className="w-14 h-14 bg-white/5 group-hover:bg-white/10 rounded-[20px] flex items-center justify-center transition-colors border border-white/10">
+                        <FileText className="w-6 h-6 text-text-primary" />
                       </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">{t[language].govtSchemes}</p>
-                        <p className="text-xs text-gray-600">{t[language].viewBenefits}</p>
+                      <div>
+                        <p className="font-semibold text-text-primary tracking-wide text-sm">{t[language].govtSchemes}</p>
+                        <p className="text-xs text-text-tertiary mt-1">{t[language].viewBenefits}</p>
                       </div>
                     </button>
                   </div>
                 </div>
 
                 {/* Latest News */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-xl text-gray-800">{t[language].latestNews}</h2>
+                <div className="glass-tier-2 rounded-[36px] p-8 glass-specular border border-white/10 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-bold text-2xl text-text-primary tracking-tight">{t[language].latestNews}</h2>
                     <button
                       onClick={() => setActiveTab('news')}
-                      className="text-green-600 text-sm font-medium hover:underline"
+                      className="text-text-secondary text-sm font-semibold hover:text-text-primary transition-colors hover:underline underline-offset-4"
                     >
                       {t[language].viewAll}
                     </button>
@@ -396,7 +413,7 @@ export default function FarmerDashboardPage() {
                     {[
                       {
                         title: 'New PM-KISAN Payment Released',
-                        summary: 'Government releases â‚¹2000 installment for eligible farmers',
+                        summary: 'Government releases ₹2000 installment for eligible farmers',
                         time: '2 hours ago',
                         category: 'Schemes'
                       },
@@ -408,20 +425,20 @@ export default function FarmerDashboardPage() {
                       },
                       {
                         title: 'Wheat MSP Increased',
-                        summary: 'Minimum Support Price raised by â‚¹150 per quintal',
+                        summary: 'Minimum Support Price raised by ₹150 per quintal',
                         time: '1 day ago',
                         category: 'Market'
                       }
                     ].map((news, idx) => (
-                      <div key={idx} className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
-                          <Newspaper className="w-4 h-4 text-green-600" />
+                      <div key={idx} className="flex items-start gap-4 p-4 glass-tier-1 border border-white/5 interactive-glass rounded-3xl hover:border-white/20 transition-all cursor-pointer group">
+                        <div className="w-12 h-12 rounded-[18px] bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:bg-white/10 transition-colors">
+                          <Newspaper className="w-5 h-5 text-text-secondary group-hover:text-text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm text-gray-800 mb-1">{news.title}</p>
-                          <p className="text-xs text-gray-600 mb-1">{news.summary}</p>
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{news.category}</span>
+                          <p className="font-bold text-base text-text-primary mb-1 truncate tracking-wide">{news.title}</p>
+                          <p className="text-sm text-text-secondary mb-2 line-clamp-1">{news.summary}</p>
+                          <div className="flex items-center gap-3 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase">
+                            <span className="glass-tier-3 px-3 py-1 rounded-full border border-white/20 text-text-primary">{news.category}</span>
                             <span>{news.time}</span>
                           </div>
                         </div>
@@ -433,75 +450,73 @@ export default function FarmerDashboardPage() {
             )}
 
             {activeTab === 'crops' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-lg border border-green-100 p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-semibold text-xl text-gray-800">{t[language].myCrops}</h2>
-                    <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all text-sm font-medium">
+              <div className="space-y-8 animate-glass-reveal">
+                <div className="glass-tier-2 rounded-[40px] shadow-2xl border border-white/10 p-8 glass-specular">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div>
+                      <h2 className="font-bold text-3xl text-text-primary text-vibrancy">{t[language].myCrops}</h2>
+                      <p className="text-sm text-text-secondary mt-1">Track and manage your cultivation zones</p>
+                    </div>
+                    <button className="glass-tier-3 text-text-primary px-6 py-3 rounded-2xl interactive-glass glass-specular font-semibold tracking-wide border border-white/20 shadow-lg hover:scale-105 active:scale-95 transition-all">
                       {t[language].addCrop}
                     </button>
                   </div>
+
                   {data?.crops && data.crops.length > 0 ? (
                     <div className="grid md:grid-cols-2 gap-6">
                       {data.crops.map((crop) => (
-                        <div key={crop.id} className="border-2 border-green-100 rounded-2xl overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1">
-                          {/* Crop Image Header */}
-                          <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-black/20" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-6xl">🌾</span>
-                            </div>
-                            <div className="absolute top-3 right-3">
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-                                crop.status === 'Healthy' ? 'bg-green-500/90 text-white' :
-                                crop.status === 'Needs Attention' ? 'bg-yellow-500/90 text-white' :
-                                'bg-gray-500/90 text-white'
-                              }`}>
+                        <div key={crop.id} className="glass-tier-1 rounded-[32px] overflow-hidden interactive-glass border border-white/10 hover:border-white/20 transition-all hover:shadow-2xl group">
+                          {/* Card Header (Image replacement via gradient/emoji due to lack of actual image) */}
+                          <div className="h-40 bg-white/5 relative overflow-hidden flex items-center justify-center border-b border-white/5">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10" />
+                            <span className="text-7xl group-hover:scale-110 transition-transform duration-700">🌾</span>
+                            <div className="absolute top-4 right-4 z-20">
+                              <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-xl border ${crop.status === 'Healthy' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
+                                crop.status === 'Needs Attention' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                                  'bg-white/20 text-white border-white/30'
+                                }`}>
                                 {crop.status}
                               </span>
                             </div>
                           </div>
-                          
-                          {/* Crop Details */}
-                          <div className="p-5">
-                            <h3 className="font-bold text-xl text-gray-800 mb-4">{crop.name}</h3>
-                            
-                            <div className="space-y-3 mb-4">
+
+                          <div className="p-6">
+                            <h3 className="font-bold text-2xl text-text-primary mb-6 tracking-tight text-vibrancy">{crop.name}</h3>
+
+                            <div className="space-y-4 mb-6">
                               <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Area</span>
-                                <span className="font-semibold text-gray-800">{crop.area}</span>
+                                <span className="text-text-tertiary uppercase tracking-wider font-semibold text-xs">Area</span>
+                                <span className="font-bold text-text-primary">{crop.area}</span>
                               </div>
                               <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Planted</span>
-                                <span className="font-semibold text-gray-800">{crop.plantedDate}</span>
+                                <span className="text-text-tertiary uppercase tracking-wider font-semibold text-xs">Planted</span>
+                                <span className="font-bold text-text-primary">{crop.plantedDate}</span>
                               </div>
                               <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">Expected Harvest</span>
-                                <span className="font-semibold text-gray-800">{crop.expectedHarvest}</span>
+                                <span className="text-text-tertiary uppercase tracking-wider font-semibold text-xs">Expected Harvest</span>
+                                <span className="font-bold text-text-primary">{crop.expectedHarvest}</span>
                               </div>
                             </div>
 
-                            {/* Growth Progress */}
-                            <div className="mb-4">
-                              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                                <span>Growth Progress</span>
+                            <div className="mb-6 bg-white/5 rounded-2xl p-4 border border-white/5">
+                              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-text-secondary mb-3">
+                                <span>Yield Progress</span>
                                 <span>75%</span>
                               </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style={{ width: '75%' }} />
+                              <div className="w-full bg-black/40 rounded-full h-2.5 shadow-inner overflow-hidden">
+                                <div className="bg-white h-full rounded-full w-[75%] shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
                               </div>
                             </div>
 
-                            {/* Quick Actions */}
-                            <div className="grid grid-cols-3 gap-2">
-                              <button className="bg-blue-50 text-blue-600 py-2 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
-                                ðŸ’§ Water
+                            <div className="grid grid-cols-3 gap-3">
+                              <button className="glass-tier-2 text-text-primary py-3 rounded-[18px] text-xs font-bold uppercase tracking-wider interactive-glass hover:bg-white/10 border border-white/10">
+                                💧 Water
                               </button>
-                              <button className="bg-green-50 text-green-600 py-2 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors">
-                                ðŸŒ± Fertilize
+                              <button className="glass-tier-2 text-text-primary py-3 rounded-[18px] text-xs font-bold uppercase tracking-wider interactive-glass hover:bg-white/10 border border-white/10">
+                                🌱 Feed
                               </button>
-                              <button className="bg-orange-50 text-orange-600 py-2 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors">
-                                ðŸ” Check
+                              <button className="glass-tier-2 text-text-primary py-3 rounded-[18px] text-xs font-bold uppercase tracking-wider interactive-glass hover:bg-white/10 border border-white/10">
+                                🔍 Scan
                               </button>
                             </div>
                           </div>
@@ -509,10 +524,10 @@ export default function FarmerDashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="text-6xl mb-4">🌾</div>
-                      <p className="text-gray-500 text-lg font-medium mb-2">{t[language].noCropsYet}</p>
-                      <p className="text-gray-400 text-sm">{t[language].startTracking}</p>
+                    <div className="text-center py-20 glass-tier-1 rounded-3xl border border-white/5">
+                      <div className="text-7xl mb-6 animate-float opacity-80 select-none">🌾</div>
+                      <p className="text-text-primary text-2xl font-bold mb-3">{t[language].noCropsYet}</p>
+                      <p className="text-text-secondary text-sm max-w-sm mx-auto">{t[language].startTracking}</p>
                     </div>
                   )}
                 </div>
@@ -520,81 +535,70 @@ export default function FarmerDashboardPage() {
             )}
 
             {activeTab === 'weather' && (
-              <div className="space-y-6">
-                {/* Current Weather Widget */}
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-6 text-white">
-                  <div className="flex items-center justify-between mb-4">
+              <div className="space-y-8 animate-glass-reveal">
+                {/* Hero Weather Card */}
+                <div className="glass-tier-2 glass-specular rounded-[40px] shadow-2xl p-8 relative overflow-hidden border border-white/20 border-t-white/40 border-l-white/40">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[100px] rounded-full pointer-events-none" />
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 relative z-10 gap-4">
                     <div>
-                      <p className="text-blue-100 text-sm mb-1">Current Weather</p>
-                      <h3 className="text-3xl font-bold">Bangalore</h3>
+                      <p className="text-text-tertiary text-xs font-bold uppercase tracking-widest mb-2">Live Conditions</p>
+                      <h3 className="text-5xl font-bold text-text-primary text-vibrancy tracking-tight">Bangalore</h3>
                     </div>
-                    <div className="text-6xl">â˜€ï¸</div>
+                    <div className="text-8xl drop-shadow-2xl">☀️</div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                      <p className="text-blue-100 text-xs mb-1">Temperature</p>
-                      <p className="text-2xl font-bold">28Â°C</p>
+                  <div className="grid grid-cols-3 gap-4 md:gap-6 relative z-10">
+                    <div className="glass-tier-3 backdrop-blur-3xl rounded-[24px] p-5 text-center border border-white/10 shadow-lg">
+                      <p className="text-text-secondary text-[11px] font-bold uppercase tracking-widest mb-2">Temperature</p>
+                      <p className="text-3xl font-bold text-text-primary text-vibrancy">28°</p>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                      <p className="text-blue-100 text-xs mb-1">Humidity</p>
-                      <p className="text-2xl font-bold">65%</p>
+                    <div className="glass-tier-3 backdrop-blur-3xl rounded-[24px] p-5 text-center border border-white/10 shadow-lg">
+                      <p className="text-text-secondary text-[11px] font-bold uppercase tracking-widest mb-2">Humidity</p>
+                      <p className="text-3xl font-bold text-text-primary text-vibrancy">65%</p>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                      <p className="text-blue-100 text-xs mb-1">Wind</p>
-                      <p className="text-2xl font-bold">12 km/h</p>
+                    <div className="glass-tier-3 backdrop-blur-3xl rounded-[24px] p-5 text-center border border-white/10 shadow-lg">
+                      <p className="text-text-secondary text-[11px] font-bold uppercase tracking-widest mb-2">Wind</p>
+                      <p className="text-3xl font-bold text-text-primary text-vibrancy">12<span className="text-lg opacity-60 ml-1">km/h</span></p>
                     </div>
                   </div>
                 </div>
 
-                {/* Weather Alerts */}
-                <div className="bg-white rounded-xl shadow-lg border border-green-100">
-                  <div className="p-6 border-b">
-                    <h2 className="font-semibold text-xl text-gray-800">Weather Alerts</h2>
+                {/* Alerts List */}
+                <div className="glass-tier-1 rounded-[40px] shadow-2xl border border-white/10">
+                  <div className="p-8 border-b border-white/5">
+                    <h2 className="font-bold text-2xl text-text-primary tracking-tight">Regional Alerts</h2>
                   </div>
-                  <div className="p-6">
+                  <div className="p-8">
                     {data?.weatherAlerts && data.weatherAlerts.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-5">
                         {data.weatherAlerts.map((alert) => (
-                          <div key={alert.id} className={`border-l-4 rounded-xl p-5 transition-all hover:shadow-md ${
-                            alert.severity === 'high' ? 'border-red-500 bg-red-50' :
-                            alert.severity === 'medium' ? 'border-orange-500 bg-orange-50' :
-                            'border-blue-500 bg-blue-50'
-                          }`}>
-                            <div className="flex items-start gap-3">
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                alert.severity === 'high' ? 'bg-red-100' :
-                                alert.severity === 'medium' ? 'bg-orange-100' :
-                                'bg-blue-100'
+                          <div key={alert.id} className="glass-tier-2 rounded-3xl p-6 interactive-glass border border-white/10 hover:border-white/20 transition-all flex items-start gap-5">
+                            <div className={`w-14 h-14 rounded-[20px] flex items-center justify-center flex-shrink-0 shadow-inner border ${alert.severity === 'high' ? 'bg-red-500/20 border-red-500/40 text-red-400' :
+                              alert.severity === 'medium' ? 'bg-orange-500/20 border-orange-500/40 text-orange-400' :
+                                'bg-blue-500/20 border-blue-500/40 text-blue-400'
                               }`}>
-                                <AlertTriangle className={`w-5 h-5 ${
-                                  alert.severity === 'high' ? 'text-red-600' :
-                                  alert.severity === 'medium' ? 'text-orange-600' :
-                                  'text-blue-600'
-                                }`} />
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <p className="font-semibold text-gray-800">{alert.type}</p>
-                                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                                    alert.severity === 'high' ? 'bg-red-200 text-red-700' :
-                                    alert.severity === 'medium' ? 'bg-orange-200 text-orange-700' :
-                                    'bg-blue-200 text-blue-700'
+                              <AlertTriangle className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                                <p className="font-bold text-lg text-text-primary">{alert.type}</p>
+                                <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm w-fit ${alert.severity === 'high' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                                  alert.severity === 'medium' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                                    'bg-blue-500/20 text-blue-300 border-blue-500/30'
                                   }`}>
-                                    {alert.severity.toUpperCase()}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-700 mb-2">{alert.message}</p>
-                                <p className="text-xs text-gray-500">{alert.date}</p>
+                                  {alert.severity}
+                                </span>
                               </div>
+                              <p className="text-sm text-text-secondary leading-relaxed mb-3">{alert.message}</p>
+                              <p className="text-xs text-text-tertiary font-semibold uppercase tracking-wider">{alert.date}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-12">
-                        <div className="text-6xl mb-4">â˜€ï¸</div>
-                        <p className="text-gray-500 text-lg font-medium mb-2">No weather alerts</p>
-                        <p className="text-gray-400 text-sm">All clear! Check back later for updates</p>
+                      <div className="text-center py-16">
+                        <div className="text-6xl mb-6 opacity-80">☀️</div>
+                        <p className="text-text-primary text-xl font-bold mb-2">Atmosphere Stable</p>
+                        <p className="text-text-secondary text-sm">No critical weather anomalies detected in your region.</p>
                       </div>
                     )}
                   </div>
@@ -603,96 +607,74 @@ export default function FarmerDashboardPage() {
             )}
 
             {activeTab === 'schemes' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-lg border border-green-100 p-6">
-                  <h2 className="font-semibold text-xl text-gray-800 mb-6">Government Schemes for Farmers</h2>
-                  
-                  <div className="space-y-4">
+              <div className="space-y-8 animate-glass-reveal">
+                <div className="glass-tier-2 rounded-[40px] shadow-2xl border border-white/10 p-8 glass-specular">
+                  <div className="mb-10">
+                    <h2 className="font-bold text-3xl text-text-primary text-vibrancy">Civil Subsidies</h2>
+                    <p className="text-text-secondary text-sm mt-2">Active government welfare programs configured for your profile.</p>
+                  </div>
+
+                  <div className="space-y-6">
                     {[
                       {
-                        name: 'PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)',
-                        description: 'Direct income support of â‚¹6000 per year in three installments',
+                        name: 'PM-KISAN',
+                        description: 'Direct income support of ₹6000 per year in three installments',
                         eligibility: 'All landholding farmers',
-                        benefit: 'â‚¹6,000/year',
+                        benefit: '₹6,000/year',
                         status: 'Active',
                         link: 'https://pmkisan.gov.in',
-                        icon: 'ðŸ’°'
+                        icon: '💰'
                       },
                       {
                         name: 'Kisan Credit Card (KCC)',
                         description: 'Credit facility for farmers to meet agricultural expenses',
                         eligibility: 'Farmers with land ownership',
-                        benefit: 'Up to â‚¹3 lakh credit',
+                        benefit: 'Up to ₹3 lakh credit',
                         status: 'Active',
-                        link: 'https://www.india.gov.in/spotlight/kisan-credit-card-kcc',
-                        icon: 'ðŸ’³'
+                        link: 'https://www.india.gov.in',
+                        icon: '💳'
                       },
                       {
-                        name: 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
+                        name: 'Fasal Bima Yojana',
                         description: 'Crop insurance scheme for natural calamities',
                         eligibility: 'All farmers growing notified crops',
                         benefit: 'Crop loss coverage',
                         status: 'Active',
                         link: 'https://pmfby.gov.in',
-                        icon: 'ðŸ›¡ï¸'
-                      },
-                      {
-                        name: 'Soil Health Card Scheme',
-                        description: 'Free soil testing and nutrient recommendations',
-                        eligibility: 'All farmers',
-                        benefit: 'Free soil analysis',
-                        status: 'Active',
-                        link: 'https://soilhealth.dac.gov.in',
-                        icon: 'ðŸŒ±'
-                      },
-                      {
-                        name: 'PM Kusum Yojana',
-                        description: 'Solar pump and grid-connected solar power plants',
-                        eligibility: 'Farmers with agricultural land',
-                        benefit: '90% subsidy',
-                        status: 'Active',
-                        link: 'https://pmkusum.mnre.gov.in',
-                        icon: 'â˜€ï¸'
-                      },
-                      {
-                        name: 'National Agriculture Market (e-NAM)',
-                        description: 'Online trading platform for agricultural commodities',
-                        eligibility: 'All farmers',
-                        benefit: 'Better price discovery',
-                        status: 'Active',
-                        link: 'https://www.enam.gov.in',
-                        icon: 'ðŸ“Š'
+                        icon: '🛡️'
                       }
                     ].map((scheme, idx) => (
-                      <div key={idx} className="border-2 border-green-100 rounded-2xl p-5 hover:shadow-lg transition-all hover:border-green-300">
-                        <div className="flex items-start gap-4">
-                          <div className="text-4xl">{scheme.icon}</div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="font-bold text-lg text-gray-800">{scheme.name}</h3>
-                              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                      <div key={idx} className="glass-tier-1 rounded-[32px] p-6 sm:p-8 interactive-glass border border-white/5 hover:border-white/20 transition-all hover:shadow-2xl">
+                        <div className="flex flex-col sm:flex-row items-start gap-6">
+                          <div className="text-6xl drop-shadow-xl select-none">{scheme.icon}</div>
+                          <div className="flex-1 w-full">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                              <h3 className="font-bold text-2xl text-text-primary tracking-tight">{scheme.name}</h3>
+                              <span className="glass-tier-3 border border-white/20 text-text-primary px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest shadow-md w-fit">
                                 {scheme.status}
                               </span>
                             </div>
-                            <p className="text-gray-600 text-sm mb-3">{scheme.description}</p>
-                            <div className="grid md:grid-cols-2 gap-3 mb-3">
-                              <div className="bg-blue-50 p-3 rounded-lg">
-                                <p className="text-xs text-blue-600 font-medium mb-1">Eligibility</p>
-                                <p className="text-sm text-gray-800">{scheme.eligibility}</p>
+                            <p className="text-text-secondary text-[15px] mb-6 leading-relaxed">{scheme.description}</p>
+
+                            <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                              <div className="glass-tier-2 p-4 rounded-2xl border border-white/5">
+                                <p className="text-[11px] text-text-tertiary font-bold uppercase tracking-widest mb-1.5">Authorization</p>
+                                <p className="text-sm font-semibold text-text-primary">{scheme.eligibility}</p>
                               </div>
-                              <div className="bg-green-50 p-3 rounded-lg">
-                                <p className="text-xs text-green-600 font-medium mb-1">Benefit</p>
-                                <p className="text-sm text-gray-800 font-semibold">{scheme.benefit}</p>
+                              <div className="bg-white/10 p-4 rounded-2xl border border-white/20 shadow-inner">
+                                <p className="text-[11px] text-text-primary/70 font-bold uppercase tracking-widest mb-1.5">Yield</p>
+                                <p className="text-lg font-bold text-text-primary">{scheme.benefit}</p>
                               </div>
                             </div>
+
                             <a
                               href={scheme.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm"
+                              className="inline-flex items-center gap-2 glass-tier-3 interactive-glass text-text-primary hover:text-white px-6 py-3 rounded-2xl font-semibold text-sm transition-all border border-white/10 hover:border-white/30 apple-focus"
                             >
-                              Learn More & Apply
-                              <ExternalLink className="w-4 h-4" />
+                              Initialize Application
+                              <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
                             </a>
                           </div>
                         </div>
@@ -704,69 +686,47 @@ export default function FarmerDashboardPage() {
             )}
 
             {activeTab === 'news' && (
-              <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-lg border border-green-100 p-6">
-                  <h2 className="font-semibold text-xl text-gray-800 mb-6">Agriculture News & Updates</h2>
-                  
-                  <div className="space-y-4">
+              <div className="space-y-8 animate-glass-reveal">
+                <div className="glass-tier-2 rounded-[40px] shadow-2xl border border-white/10 p-8 glass-specular">
+                  <div className="mb-10">
+                    <h2 className="font-bold text-3xl text-text-primary text-vibrancy">Global Feed</h2>
+                    <p className="text-text-secondary text-sm mt-2">Aggregated news from verified agricultural networks.</p>
+                  </div>
+
+                  <div className="space-y-5">
                     {[
                       {
                         title: 'New PM-KISAN Payment Released',
-                        summary: 'Government releases ₹2000 installment for eligible farmers',
+                        summary: 'Government releases ₹2000 installment for eligible farmers across the nation.',
                         category: 'Government Schemes',
                         date: '2 hours ago',
                         source: 'PIB India'
                       },
                       {
-                        title: 'IMD Predicts Normal Monsoon for 2026',
-                        summary: 'India Meteorological Department forecasts normal rainfall during the upcoming monsoon season, bringing relief to farmers across the country.',
-                        category: 'Weather',
-                        date: '5 hours ago',
-                        source: 'IMD'
-                      },
-                      {
-                        title: 'Wheat MSP Increased by ₹150 per Quintal',
-                        summary: 'Government raises Minimum Support Price for wheat to ₹2275 per quintal for the 2026-27 season, benefiting millions of wheat farmers.',
-                        category: 'Market Prices',
-                        date: '1 day ago',
-                        source: 'Ministry of Agriculture'
-                      },
-                      {
-                        title: 'New Organic Farming Subsidy Announced',
-                        summary: 'State government launches 50% subsidy scheme for farmers transitioning to organic farming methods. Applications open from next month.',
-                        category: 'Subsidies',
-                        date: '2 days ago',
-                        source: 'State Agriculture Dept'
-                      },
-                      {
-                        title: 'Drone Technology for Pesticide Spraying',
-                        summary: 'Agricultural drones now available on rent at subsidized rates. Technology helps reduce pesticide usage by 30% while improving coverage.',
-                        category: 'Technology',
-                        date: '3 days ago',
-                        source: 'AgriTech News'
-                      },
-                      {
                         title: 'Record Tomato Prices in Major Markets',
-                        summary: 'Tomato prices surge to ₹80-100 per kg in major cities due to supply shortage. Farmers advised to increase cultivation.',
+                        summary: 'Tomato prices surge to ₹80-100 per kg in central cities due to supply chain disruption.',
                         category: 'Market Alert',
-                        date: '4 days ago',
+                        date: '4 hours ago',
                         source: 'Market Watch'
                       }
                     ].map((news, idx) => (
-                      <div key={idx} className="border-2 border-gray-100 rounded-2xl p-5 hover:shadow-lg transition-all hover:border-green-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                      <div key={idx} className="glass-tier-1 border border-white/5 rounded-[28px] p-6 interactive-glass hover:border-white/20 transition-all flex flex-col gap-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="glass-tier-3 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-text-primary border border-white/10">
                             {news.category}
                           </span>
-                          <span className="text-xs text-gray-500">{news.date}</span>
+                          <span className="text-xs text-text-tertiary font-semibold uppercase tracking-wider">{news.date}</span>
                         </div>
-                        <h3 className="font-bold text-lg text-gray-800 mb-2">{news.title}</h3>
-                        <p className="text-gray-600 text-sm mb-3">{news.summary}</p>
+                        <div>
+                          <h3 className="font-bold text-xl text-text-primary mb-2 tracking-tight">{news.title}</h3>
+                          <p className="text-text-secondary text-sm leading-relaxed">{news.summary}</p>
+                        </div>
+                        <div className="h-px bg-white/5 w-full my-2" />
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Source: {news.source}</span>
-                          <button className="text-green-600 hover:text-green-700 font-medium text-sm inline-flex items-center gap-1">
-                            Read More
-                            <ExternalLink className="w-3 h-3" />
+                          <span className="text-[11px] font-bold uppercase tracking-widest text-text-tertiary">Relay: {news.source}</span>
+                          <button className="text-text-primary hover:text-white font-semibold text-sm inline-flex items-center gap-2 apple-focus p-2 -mr-2 rounded-lg hover:bg-white/5 transition-colors">
+                            Establish Connection
+                            <ExternalLink className="w-3 h-3 opacity-60" />
                           </button>
                         </div>
                       </div>
@@ -777,54 +737,79 @@ export default function FarmerDashboardPage() {
             )}
 
             {activeTab === 'advice' && (
-              <div className="bg-white rounded-xl shadow-lg border border-green-100">
-                <div className="p-6 border-b">
-                  <h2 className="font-semibold text-xl text-gray-800">AI Advice History</h2>
+              <div className="glass-tier-2 rounded-[40px] shadow-2xl border border-white/10 flex flex-col h-[calc(100vh-200px)] lg:h-[800px] overflow-hidden glass-specular animate-glass-reveal">
+                <div className="p-8 border-b border-white/10 shrink-0">
+                  <h2 className="font-bold text-3xl text-text-primary text-vibrancy">Memory Core</h2>
+                  <p className="text-text-secondary text-sm mt-2">Archived consultations with KrishiMitra AI.</p>
                 </div>
-                <div className="p-6">
+                <div className="p-8 overflow-y-auto custom-scrollbar flex-1">
                   {data?.aiAdviceHistory && data.aiAdviceHistory.length > 0 ? (
                     <div className="space-y-4">
                       {data.aiAdviceHistory.map((advice) => (
-                        <div key={advice.id} className="border-2 border-green-100 rounded-xl p-5 hover:shadow-md transition-shadow">
-                          <p className="font-semibold mb-2 text-gray-800">{advice.query}</p>
-                          <p className="text-sm text-gray-600 mb-2">{advice.summary}</p>
-                          <p className="text-xs text-gray-500">{advice.date}</p>
+                        <div key={advice.id} className="glass-tier-1 border border-white/5 rounded-3xl p-6 interactive-glass hover:border-white/20 transition-all">
+                          <p className="font-bold mb-3 text-lg text-text-primary">&ldquo;{advice.query}&rdquo;</p>
+                          <p className="text-sm text-text-secondary leading-relaxed mb-4">{advice.summary}</p>
+                          <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest text-text-tertiary">
+                            <MessageSquare className="w-3 h-3 opacity-50" />
+                            {advice.date}
+                          </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-12">No advice history yet</p>
+                    <div className="flex items-center justify-center h-full flex-col text-center">
+                      <MessageSquare className="w-16 h-16 text-white/10 mb-6" />
+                      <p className="text-text-primary text-xl font-bold mb-2">No Archives Found</p>
+                      <p className="text-text-secondary text-sm max-w-sm mx-auto">Engage the AI through the chat interface to begin logging records.</p>
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
             {activeTab === 'products' && (
-              <div className="bg-white rounded-xl shadow-lg border border-green-100">
-                <div className="p-6 border-b">
-                  <h2 className="font-semibold text-xl text-gray-800">AI Recommended Products</h2>
+              <div className="glass-tier-2 rounded-[40px] shadow-2xl border border-white/10 p-8 glass-specular animate-glass-reveal">
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="font-bold text-3xl text-text-primary text-vibrancy">Intelligence Recommendations</h2>
+                    <p className="text-text-secondary text-sm mt-2">Tools and provisions suggested based on your telemetry.</p>
+                  </div>
+                  <button onClick={() => router.push('/marketplace')} className="glass-tier-3 text-text-primary px-6 py-3 rounded-2xl interactive-glass glass-specular font-semibold tracking-wide border border-white/20 shadow-lg hover:scale-105 active:scale-95 transition-all outline-none">
+                    Browse Full Store
+                  </button>
                 </div>
-                <div className="p-6">
+                <div>
                   {data?.recommendedProducts && data.recommendedProducts.length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-5">
                       {data.recommendedProducts.map((product) => (
-                        <div key={product.id} className="border-2 border-green-100 rounded-xl p-5 flex items-center justify-between hover:shadow-md transition-shadow">
-                          <div className="flex-1">
-                            <h3 className="font-semibold mb-1 text-gray-800">{product.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{product.reason}</p>
-                            <p className="text-xl font-bold text-green-600">₹{product.price}</p>
+                        <div key={product.id} className="glass-tier-1 border border-white/5 rounded-[32px] p-6 flex flex-col interactive-glass hover:border-white/20 transition-all justify-between min-h-[220px]">
+                          <div>
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <h3 className="font-bold text-xl text-text-primary">{product.name}</h3>
+                              <span className="glass-tier-3 px-3 py-1 rounded-full border border-white/10 text-[10px] uppercase font-bold tracking-widest text-text-primary shrink-0">
+                                Match
+                              </span>
+                            </div>
+                            <p className="text-sm text-text-secondary line-clamp-2">{product.reason}</p>
                           </div>
-                          <button
-                            onClick={() => router.push(`/marketplace/${product.id}`)}
-                            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all font-medium"
-                          >
-                            View
-                          </button>
+                          <div className="flex items-center justify-between mt-6">
+                            <p className="text-2xl font-bold text-text-primary">₹{product.price}</p>
+                            <button
+                              onClick={() => router.push(`/marketplace/${product.id}`)}
+                              className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg apple-focus"
+                            >
+                              Detail
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-12">No recommendations yet</p>
+                    <div className="text-center py-20 glass-tier-1 rounded-3xl border border-white/5">
+                      <ShoppingBag className="w-16 h-16 text-white/10 mx-auto mb-6" />
+                      <p className="text-text-primary text-xl font-bold mb-2">Insufficient Data</p>
+                      <p className="text-text-secondary text-sm max-w-xs mx-auto">Register more crops or engage the AI for personalized provisions.</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -832,109 +817,6 @@ export default function FarmerDashboardPage() {
           </main>
         </div>
       </div>
-
-      {/* Floating AI Chatbot Widget */}
-      {showChatbot ? (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border-2 border-green-200 flex flex-col z-50">
-          {/* Chatbot Header */}
-          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                🌾
-              </div>
-              <div>
-                <p className="font-semibold">KrishiMitra AI</p>
-                <p className="text-xs text-green-100">Your farming assistant</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowChatbot(false)}
-              className="hover:bg-white/20 p-2 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Chat Messages */}
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-            {chatHistory.length === 0 ? (
-              <div className="text-center text-gray-500 mt-8">
-                <p className="text-sm">ðŸ‘‹ Hi {userName}!</p>
-                <p className="text-sm mt-2">Ask me anything about farming!</p>
-                <div className="mt-4 space-y-2">
-                  <button
-                    onClick={() => setChatMessage('What is the weather forecast?')}
-                    className="w-full text-left px-3 py-2 bg-white rounded-lg text-xs hover:bg-green-50 transition-colors"
-                  >
-                    ðŸŒ¤ï¸ What is the weather forecast?
-                  </button>
-                  <button
-                    onClick={() => setChatMessage('Tell me about PM-KISAN scheme')}
-                    className="w-full text-left px-3 py-2 bg-white rounded-lg text-xs hover:bg-green-50 transition-colors"
-                  >
-                    ðŸ’° Tell me about PM-KISAN scheme
-                  </button>
-                  <button
-                    onClick={() => setChatMessage('Best fertilizer for wheat?')}
-                    className="w-full text-left px-3 py-2 bg-white rounded-lg text-xs hover:bg-green-50 transition-colors"
-                  >
-                    ðŸŒ¾ Best fertilizer for wheat?
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {chatHistory.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] px-4 py-2 rounded-lg ${
-                        msg.role === 'user'
-                          ? 'bg-green-500 text-white'
-                          : 'bg-white border border-gray-200 text-gray-800'
-                      }`}
-                    >
-                      <p className="text-sm">{msg.message}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Chat Input */}
-          <form onSubmit={handleChatSubmit} className="p-4 border-t bg-white rounded-b-2xl">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                placeholder="Type your question..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 text-sm"
-              />
-              <button
-                type="submit"
-                className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition-colors"
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
-          </form>
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowChatbot(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all hover:scale-110 group z-50"
-          title="AI Chat"
-        >
-          <MessageSquare className="w-6 h-6" />
-          <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-3 py-1 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-            Quick AI Chat
-          </span>
-        </button>
-      )}
     </div>
   );
 }
