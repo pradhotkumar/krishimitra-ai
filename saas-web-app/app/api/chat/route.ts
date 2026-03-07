@@ -31,7 +31,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate intelligent response based on message content
+    // Call backend API for AI response
+    try {
+      const backendResponse = await fetch(`${BACKEND_URL}/api/chat/public`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+          userId: sessionId || `user_${Date.now()}`
+        })
+      });
+
+      if (backendResponse.ok) {
+        const data = await backendResponse.json();
+        return NextResponse.json({
+          response: data.aiResponse || data.message || 'No response from AI',
+          sessionId: sessionId || `session_${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          language: language || 'hi',
+          classification: data.classification,
+          suggestions: data.suggestions
+        });
+      }
+    } catch (backendError) {
+      console.error('Backend API error:', backendError);
+      // Fall back to local response if backend fails
+    }
+
+    // Fallback: Generate intelligent response based on message content
     const response = generateIntelligentResponse(message, language || 'hi', context);
 
     return NextResponse.json({
