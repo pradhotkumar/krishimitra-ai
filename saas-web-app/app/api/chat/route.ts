@@ -1,10 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Language-specific responses
-const responses: { [key: string]: { [key: string]: string } } = {
-  greeting: {
-    hi: 'नमस्ते! मैं कृषिमित्र हूं। मैं आपकी मदद कर सकती हूं:\n\n🌤️ मौसम की जानकारी\n🌱 फसल की सलाह\n💰 मंडी के भाव\n🐛 कीट और रोग प्रबंधन\n🌾 उर्वरक की सिफारिश\n\nआप क्या जानना चाहते हैं?',
-    en: 'Hello! I am KrishiMitra. I can help you with:\n\n🌤️ Weather information\n🌱 Crop advice\n💰 Market prices\n🐛 Pest and disease management\n🌾 Fertilizer recommendations\n\nWhat would you like to know?',
+const BACKEND_URL = process.env.BACKEND_URL || 'http://13.233.164.128:3001';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { message, language, sessionId } = body;
+
+    if (!message) {
+      return NextResponse.json(
+        { error: 'Message is required' },
+        { status: 400 }
+      );
+    }
+
+    // Call EC2 backend with Bedrock AI
+    const backendResponse = await fetch(`${BACKEND_URL}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: message,
+        userId: sessionId || 'anonymous'
+      })
+    });
+
+    if (!backendResponse.ok) {
+      throw new Error('Backend request failed');
+    }
+
+    const data = await backendResponse.json();
+
+    return NextResponse.json({
+      response: data.aiResponse || data.message || 'No response from AI',
+      sessionId: sessionId || `session_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      language: language || 'en',
+    });
+  } catch (error: any) {
+    console.error('Chat API proxy error:', error);
+    
+    // Fallback response
+    return NextResponse.json({
+      response: 'I apologize, but I am having trouble connecting to the AI service. Please try again.',
+      sessionId: `session_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      language: 'en',
+    });
+  }
+}
     ta: 'வணக்கம்! நான் கிருஷிமித்ரா. நான் உங்களுக்கு உதவ முடியும்:\n\n🌤️ வானிலை தகவல்\n🌱 பயிர் ஆலோசனை\n💰 சந்தை விலைகள்\n🐛 பூச்சி மற்றும் நோய் மேலாண்மை\n🌾 உர பரிந்துரைகள்\n\nநீங்கள் என்ன தெரிந்து கொள்ள விரும்புகிறீர்கள்?',
     te: 'నమస్కారం! నేను కృషిమిత్ర. నేను మీకు సహాయం చేయగలను:\n\n🌤️ వాతావరణ సమాచారం\n🌱 పంట సలహా\n💰 మార్కెట్ ధరలు\n🐛 చీడపురుగుల మరియు వ్యాధి నిర్వహణ\n🌾 ఎరువుల సిఫార్సులు\n\nమీరు ఏమి తెలుసుకోవాలనుకుంటున్నారు?',
     kn: 'ನಮಸ್ಕಾರ! ನಾನು ಕೃಷಿಮಿತ್ರ. ನಾನು ನಿಮಗೆ ಸಹಾಯ ಮಾಡಬಲ್ಲೆ:\n\n🌤️ ಹವಾಮಾನ ಮಾಹಿತಿ\n🌱 ಬೆಳೆ ಸಲಹೆ\n💰 ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು\n🐛 ಕೀಟ ಮತ್ತು ರೋಗ ನಿರ್ವಹಣೆ\n🌾 ಗೊಬ್ಬರ ಶಿಫಾರಸುಗಳು\n\nನೀವು ಏನು ತಿಳಿಯಲು ಬಯಸುತ್ತೀರಿ?',
