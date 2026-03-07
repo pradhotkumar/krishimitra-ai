@@ -1,18 +1,30 @@
-import axios from "axios";
+import express from "express";
+import { getWeather } from "../services/weatherService";
 
-const API_KEY = "62c70ac3a9fe7950bfdcc62f44c8de72";
+const router = express.Router();
 
-export async function getWeather(location: string) {
+router.get("/weather", async (req, res) => {
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${API_KEY}&units=metric`;
+  try {
 
-  const response = await axios.get(url);
+    const location = req.query.location as string;
 
-  return {
-    location,
-    temperature: response.data.main.temp,
-    humidity: response.data.main.humidity,
-    conditions: response.data.weather[0].description,
-    wind_speed: response.data.wind.speed
-  };
-}
+    const weather = await getWeather(location || "Bangalore");
+
+    res.json({
+      success: true,
+      data: weather
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Weather fetch failed"
+    });
+
+  }
+
+});
+
+export default router;
