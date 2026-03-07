@@ -9,6 +9,16 @@ interface ScanResult {
   severity: string;
   treatment: string[];
   preventiveMeasures: string[];
+  pestInfo?: {
+    name: string;
+    description: string;
+    control: string[];
+  };
+  soilRecommendation?: {
+    ph: string;
+    nutrients: string[];
+    amendments: string[];
+  };
 }
 
 export default function LeafScanner() {
@@ -101,7 +111,7 @@ export default function LeafScanner() {
     if (!selectedImage) return;
     
     setScanning(true);
-    // Simulate AI analysis
+    // Simulate AI analysis with enhanced results
     setTimeout(() => {
       setResult({
         disease: 'Leaf Blight - पत्ती झुलसा रोग',
@@ -118,7 +128,29 @@ export default function LeafScanner() {
           'Apply neem oil spray weekly / साप्ताहिक नीम तेल का छिड़काव करें',
           'Avoid overhead watering / ऊपर से पानी देने से बचें',
           'Use disease-resistant varieties / रोग प्रतिरोधी किस्मों का उपयोग करें'
-        ]
+        ],
+        pestInfo: {
+          name: 'Aphids detected / एफिड्स का पता चला',
+          description: 'Small sap-sucking insects that can spread diseases / छोटे रस चूसने वाले कीड़े जो रोग फैला सकते हैं',
+          control: [
+            'Spray neem oil solution (5ml per liter) / नीम तेल का घोल छिड़कें',
+            'Introduce ladybugs as natural predators / प्राकृतिक शिकारी के रूप में लेडीबग्स लाएं',
+            'Use yellow sticky traps / पीले चिपचिपे जाल का उपयोग करें'
+          ]
+        },
+        soilRecommendation: {
+          ph: '6.5-7.0 (Slightly acidic to neutral / थोड़ा अम्लीय से तटस्थ)',
+          nutrients: [
+            'Nitrogen (N): Medium / नाइट्रोजन: मध्यम',
+            'Phosphorus (P): High / फास्फोरस: उच्च',
+            'Potassium (K): Medium / पोटेशियम: मध्यम'
+          ],
+          amendments: [
+            'Add compost 2-3 kg per plant / प्रति पौधा 2-3 किलो खाद डालें',
+            'Apply bone meal for phosphorus / फास्फोरस के लिए हड्डी का चूर्ण डालें',
+            'Use wood ash for potassium / पोटेशियम के लिए लकड़ी की राख का उपयोग करें'
+          ]
+        }
       });
       setScanning(false);
     }, 2500);
@@ -331,28 +363,46 @@ export default function LeafScanner() {
 
               {/* Actions */}
               <div className="flex flex-col gap-3">
+                {/* Back Button */}
+                <button
+                  onClick={() => {
+                    setSelectedImage(null);
+                    setResult(null);
+                  }}
+                  className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back / वापस जाएं
+                </button>
+
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
                       setSelectedImage(null);
                       setResult(null);
                     }}
-                    className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                    className="flex-1 bg-blue-100 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-200 transition-colors font-medium flex items-center justify-center gap-2"
                   >
-                    Scan Another / दूसरी जांच करें
+                    <Camera className="w-5 h-5" />
+                    Scan Another / दूसरी जांच
                   </button>
                   <button
                     onClick={() => {
                       alert('Treatment plan saved to your dashboard! / उपचार योजना सहेजी गई!');
                     }}
-                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
                   >
-                    Save Plan / योजना सहेजें
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Save / सहेजें
                   </button>
                 </div>
 
                 {/* Expert Consultation Option */}
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-5 border-2 border-purple-200">
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-5 border-2 border-purple-200 shadow-md">
                   <div className="flex items-start gap-4">
                     <div className="bg-purple-100 p-3 rounded-lg flex-shrink-0">
                       <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,7 +410,8 @@ export default function LeafScanner() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-gray-800 mb-2">
+                      <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <span className="text-xl">👨‍🌾</span>
                         Need Expert Help? / विशेषज्ञ सहायता चाहिए?
                       </h4>
                       <p className="text-sm text-gray-600 mb-3">
@@ -370,19 +421,30 @@ export default function LeafScanner() {
                       </p>
                       <button
                         onClick={() => {
-                          alert('Connecting you to an expert... Please wait. / विशेषज्ञ से जुड़ रहे हैं... कृपया प्रतीक्षा करें।');
-                          // In production, this would open a video call interface
+                          alert('Connecting you to an expert... Please wait.\n\nविशेषज्ञ से जुड़ रहे हैं... कृपया प्रतीक्षा करें।\n\nYou will receive a call within 5 minutes.\nआपको 5 मिनट में कॉल आएगी।');
+                          // In production, this would open a video call interface or schedule a consultation
                         }}
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all font-medium flex items-center justify-center gap-2 shadow-lg"
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
-                        Video Call Expert / विशेषज्ञ से वीडियो कॉल करें
+                        Consult Expert Now / अभी विशेषज्ञ से परामर्श करें
                       </button>
-                      <p className="text-xs text-gray-500 mt-2 text-center">
-                        Available 9 AM - 6 PM / सुबह 9 बजे से शाम 6 बजे तक उपलब्ध
-                      </p>
+                      <div className="flex items-center justify-between mt-3 text-xs text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Available 9 AM - 6 PM
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                          </svg>
+                          Free Consultation
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>

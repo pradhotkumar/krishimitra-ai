@@ -57,11 +57,13 @@ export default function FarmerDashboardPage() {
   const [showChatbot, setShowChatbot] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{role: string, message: string}>>([]);
+  const [language, setLanguage] = useState<'en' | 'hi'>('en');
 
   useEffect(() => {
     // Check authentication and get user name
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     const storedName = localStorage.getItem('userName');
+    const storedLanguage = localStorage.getItem('language') as 'en' | 'hi';
     
     if (!isAuthenticated) {
       router.push('/auth?redirect=/dashboard/farmer');
@@ -72,8 +74,93 @@ export default function FarmerDashboardPage() {
       setUserName(storedName);
     }
 
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+
     fetchDashboardData();
   }, [router]);
+
+  const toggleLanguage = () => {
+    const newLanguage = language === 'en' ? 'hi' : 'en';
+    setLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
+  const t = {
+    en: {
+      dashboard: 'Farmer Dashboard',
+      welcome: 'Welcome back',
+      logout: 'Logout',
+      overview: 'Overview',
+      myCrops: 'My Crops',
+      weatherAlerts: 'Weather Alerts',
+      govtSchemes: 'Govt Schemes',
+      agriNews: 'Agri News',
+      aiAdviceHistory: 'AI Advice History',
+      recommendedProducts: 'Recommended Products',
+      activeCrops: 'Active Crops',
+      newAlerts: 'New',
+      aiConsultations: 'AI Consultations',
+      quickActions: 'Quick Actions',
+      askAIExpert: 'Ask AI Expert',
+      getFarmingAdvice: 'Get farming advice',
+      plantCare: 'Plant Care',
+      scanLeafDiseases: 'Scan leaf diseases',
+      marketplace: 'Marketplace',
+      buySupplies: 'Buy supplies',
+      viewBenefits: 'View benefits',
+      latestNews: 'Latest Agriculture News',
+      viewAll: 'View All',
+      addCrop: '+ Add Crop',
+      noCropsYet: 'No crops added yet',
+      startTracking: 'Start tracking your crops to get AI-powered insights',
+      currentWeather: 'Current Weather',
+      temperature: 'Temperature',
+      humidity: 'Humidity',
+      wind: 'Wind',
+      noWeatherAlerts: 'No weather alerts',
+      allClear: 'All clear! Check back later for updates',
+      noAdviceYet: 'No advice history yet',
+      noRecommendations: 'No recommendations yet'
+    },
+    hi: {
+      dashboard: 'किसान डैशबोर्ड',
+      welcome: 'वापसी पर स्वागत है',
+      logout: 'लॉगआउट',
+      overview: 'अवलोकन',
+      myCrops: 'मेरी फसलें',
+      weatherAlerts: 'मौसम चेतावनी',
+      govtSchemes: 'सरकारी योजनाएं',
+      agriNews: 'कृषि समाचार',
+      aiAdviceHistory: 'AI सलाह इतिहास',
+      recommendedProducts: 'अनुशंसित उत्पाद',
+      activeCrops: 'सक्रिय फसलें',
+      newAlerts: 'नया',
+      aiConsultations: 'AI परामर्श',
+      quickActions: 'त्वरित कार्य',
+      askAIExpert: 'AI विशेषज्ञ से पूछें',
+      getFarmingAdvice: 'खेती की सलाह लें',
+      plantCare: 'पौधे की देखभाल',
+      scanLeafDiseases: 'पत्ती रोग स्कैन करें',
+      marketplace: 'बाज़ार',
+      buySupplies: 'सामान खरीदें',
+      viewBenefits: 'लाभ देखें',
+      latestNews: 'नवीनतम कृषि समाचार',
+      viewAll: 'सभी देखें',
+      addCrop: '+ फसल जोड़ें',
+      noCropsYet: 'अभी तक कोई फसल नहीं जोड़ी गई',
+      startTracking: 'AI-संचालित जानकारी प्राप्त करने के लिए अपनी फसलों को ट्रैक करना शुरू करें',
+      currentWeather: 'वर्तमान मौसम',
+      temperature: 'तापमान',
+      humidity: 'आर्द्रता',
+      wind: 'हवा',
+      noWeatherAlerts: 'कोई मौसम चेतावनी नहीं',
+      allClear: 'सब ठीक है! अपडेट के लिए बाद में जांचें',
+      noAdviceYet: 'अभी तक कोई सलाह इतिहास नहीं',
+      noRecommendations: 'अभी तक कोई सिफारिश नहीं'
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -124,23 +211,40 @@ export default function FarmerDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
-                Farmer Dashboard
+                {t[language].dashboard}
               </h1>
               <p className="text-gray-600 mt-1">
-                Welcome back, <span className="font-semibold text-green-700">{userName}</span>! 🌾
+                {t[language].welcome}, <span className="font-semibold text-green-700">{userName}</span>! 🌾
               </p>
             </div>
-            <button
-              onClick={() => {
-                localStorage.removeItem('isAuthenticated');
-                localStorage.removeItem('user');
-                localStorage.removeItem('userName');
-                router.push('/');
-              }}
-              className="px-6 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
-            >
-              Logout
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg hover:border-blue-400 transition-all hover:shadow-md"
+                title={language === 'en' ? 'Switch to Hindi' : 'अंग्रेजी में बदलें'}
+              >
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span className="font-semibold text-blue-700">
+                  {language === 'en' ? 'English' : 'हिंदी'}
+                </span>
+              </button>
+              
+              <button
+                onClick={() => {
+                  localStorage.removeItem('isAuthenticated');
+                  localStorage.removeItem('user');
+                  localStorage.removeItem('userName');
+                  localStorage.removeItem('language');
+                  router.push('/');
+                }}
+                className="px-6 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
+              >
+                {t[language].logout}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -151,13 +255,13 @@ export default function FarmerDashboardPage() {
           <aside className="lg:col-span-1">
             <nav className="bg-white rounded-xl shadow-lg p-4 space-y-2 border border-green-100">
               {[
-                { id: 'overview', label: 'Overview', icon: BarChart3 },
-                { id: 'crops', label: 'My Crops', icon: Sprout },
-                { id: 'weather', label: 'Weather Alerts', icon: Cloud },
-                { id: 'schemes', label: 'Govt Schemes', icon: TrendingUp },
-                { id: 'news', label: 'Agri News', icon: MessageSquare },
-                { id: 'advice', label: 'AI Advice History', icon: MessageSquare },
-                { id: 'products', label: 'Recommended Products', icon: ShoppingBag }
+                { id: 'overview', label: t[language].overview, icon: BarChart3 },
+                { id: 'crops', label: t[language].myCrops, icon: Sprout },
+                { id: 'weather', label: t[language].weatherAlerts, icon: Cloud },
+                { id: 'schemes', label: t[language].govtSchemes, icon: TrendingUp },
+                { id: 'news', label: t[language].agriNews, icon: MessageSquare },
+                { id: 'advice', label: t[language].aiAdviceHistory, icon: MessageSquare },
+                { id: 'products', label: t[language].recommendedProducts, icon: ShoppingBag }
               ].map((item) => (
                 <button
                   key={item.id}
@@ -186,7 +290,7 @@ export default function FarmerDashboardPage() {
                       <Sprout className="w-10 h-10" />
                       <TrendingUp className="w-6 h-6" />
                     </div>
-                    <p className="text-green-100 text-sm">Active Crops</p>
+                    <p className="text-green-100 text-sm">{t[language].activeCrops}</p>
                     <p className="text-4xl font-bold mt-1">
                       {data?.crops?.length || 3}
                     </p>
@@ -196,10 +300,10 @@ export default function FarmerDashboardPage() {
                     <div className="flex items-center justify-between mb-4">
                       <AlertTriangle className="w-10 h-10" />
                       <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                        New
+                        {t[language].newAlerts}
                       </span>
                     </div>
-                    <p className="text-orange-100 text-sm">Weather Alerts</p>
+                    <p className="text-orange-100 text-sm">{t[language].weatherAlerts}</p>
                     <p className="text-4xl font-bold mt-1">
                       {data?.weatherAlerts?.length || 3}
                     </p>
@@ -209,7 +313,7 @@ export default function FarmerDashboardPage() {
                     <div className="flex items-center justify-between mb-4">
                       <MessageSquare className="w-10 h-10" />
                     </div>
-                    <p className="text-blue-100 text-sm">AI Consultations</p>
+                    <p className="text-blue-100 text-sm">{t[language].aiConsultations}</p>
                     <p className="text-4xl font-bold mt-1">
                       {data?.aiAdviceHistory?.length || 3}
                     </p>
@@ -218,8 +322,8 @@ export default function FarmerDashboardPage() {
 
                 {/* Quick Actions */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
-                  <h2 className="font-semibold text-xl mb-4 text-gray-800">Quick Actions</h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <h2 className="font-semibold text-xl mb-4 text-gray-800">{t[language].quickActions}</h2>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <button
                       onClick={() => router.push('/chat')}
                       className="flex flex-col items-center gap-3 p-5 border-2 border-green-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all hover:shadow-md"
@@ -228,8 +332,24 @@ export default function FarmerDashboardPage() {
                         <MessageSquare className="w-6 h-6 text-green-600" />
                       </div>
                       <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">Ask AI Expert</p>
-                        <p className="text-xs text-gray-600">Get farming advice</p>
+                        <p className="font-semibold text-gray-800 text-sm">{t[language].askAIExpert}</p>
+                        <p className="text-xs text-gray-600">{t[language].getFarmingAdvice}</p>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => router.push('/plant-health')}
+                      className="flex flex-col items-center gap-3 p-5 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all hover:shadow-md"
+                    >
+                      <div className="bg-blue-100 p-3 rounded-lg">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-semibold text-gray-800 text-sm">{t[language].plantCare}</p>
+                        <p className="text-xs text-gray-600">{t[language].scanLeafDiseases}</p>
                       </div>
                     </button>
 
@@ -241,8 +361,8 @@ export default function FarmerDashboardPage() {
                         <ShoppingBag className="w-6 h-6 text-orange-600" />
                       </div>
                       <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">Marketplace</p>
-                        <p className="text-xs text-gray-600">Buy supplies</p>
+                        <p className="font-semibold text-gray-800 text-sm">{t[language].marketplace}</p>
+                        <p className="text-xs text-gray-600">{t[language].buySupplies}</p>
                       </div>
                     </button>
 
@@ -254,8 +374,8 @@ export default function FarmerDashboardPage() {
                         <FileText className="w-6 h-6 text-purple-600" />
                       </div>
                       <div className="text-center">
-                        <p className="font-semibold text-gray-800 text-sm">Govt Schemes</p>
-                        <p className="text-xs text-gray-600">View benefits</p>
+                        <p className="font-semibold text-gray-800 text-sm">{t[language].govtSchemes}</p>
+                        <p className="text-xs text-gray-600">{t[language].viewBenefits}</p>
                       </div>
                     </button>
                   </div>
@@ -264,12 +384,12 @@ export default function FarmerDashboardPage() {
                 {/* Latest News */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-green-100">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-xl text-gray-800">Latest Agriculture News</h2>
+                    <h2 className="font-semibold text-xl text-gray-800">{t[language].latestNews}</h2>
                     <button
                       onClick={() => setActiveTab('news')}
                       className="text-green-600 text-sm font-medium hover:underline"
                     >
-                      View All
+                      {t[language].viewAll}
                     </button>
                   </div>
                   <div className="space-y-3">
@@ -316,9 +436,9 @@ export default function FarmerDashboardPage() {
               <div className="space-y-6">
                 <div className="bg-white rounded-xl shadow-lg border border-green-100 p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-semibold text-xl text-gray-800">My Crops</h2>
+                    <h2 className="font-semibold text-xl text-gray-800">{t[language].myCrops}</h2>
                     <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all text-sm font-medium">
-                      + Add Crop
+                      {t[language].addCrop}
                     </button>
                   </div>
                   {data?.crops && data.crops.length > 0 ? (
@@ -391,8 +511,8 @@ export default function FarmerDashboardPage() {
                   ) : (
                     <div className="text-center py-12">
                       <div className="text-6xl mb-4">🌾</div>
-                      <p className="text-gray-500 text-lg font-medium mb-2">No crops added yet</p>
-                      <p className="text-gray-400 text-sm">Start tracking your crops to get AI-powered insights</p>
+                      <p className="text-gray-500 text-lg font-medium mb-2">{t[language].noCropsYet}</p>
+                      <p className="text-gray-400 text-sm">{t[language].startTracking}</p>
                     </div>
                   )}
                 </div>

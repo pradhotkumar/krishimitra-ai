@@ -11,7 +11,9 @@ import {
   Mic, 
   LayoutDashboard,
   LogOut,
-  Globe
+  Globe,
+  Leaf,
+  Camera
 } from 'lucide-react';
 
 interface Message {
@@ -418,6 +420,14 @@ export default function ChatPage() {
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-800 space-y-2">
           <button
+            onClick={() => router.push('/plant-health')}
+            className="w-full flex items-center gap-3 px-3 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg transition-all shadow-lg"
+          >
+            <Leaf className="w-5 h-5" />
+            <span className="text-sm font-medium">Plant Health</span>
+          </button>
+
+          <button
             onClick={() => router.push('/dashboard/farmer')}
             className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors"
           >
@@ -522,6 +532,34 @@ export default function ChatPage() {
 
                 {/* Feature Cards */}
                 <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  {/* Plant Health Feature - Highlighted */}
+                  <button
+                    onClick={() => router.push('/plant-health')}
+                    className="group col-span-2 flex items-center gap-4 p-6 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl hover:from-green-700 hover:to-green-800 hover:shadow-2xl hover:scale-105 transition-all text-left border-2 border-green-400"
+                  >
+                    <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl group-hover:scale-110 transition-transform">
+                      <Camera className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-xl text-white">
+                          {language === 'hi' ? '🌿 पौधे स्वास्थ्य परीक्षण' : '🌿 Plant Health Testing'}
+                        </span>
+                        <span className="px-2 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
+                          {language === 'hi' ? 'नया' : 'NEW'}
+                        </span>
+                      </div>
+                      <p className="text-green-50 text-sm">
+                        {language === 'hi' 
+                          ? 'AI से पत्ती की फोटो लेकर रोग की पहचान करें और तुरंत उपचार पाएं'
+                          : 'Scan leaf photos with AI to identify diseases and get instant treatment'}
+                      </p>
+                    </div>
+                    <div className="text-white group-hover:translate-x-1 transition-transform">
+                      →
+                    </div>
+                  </button>
+
                   {[
                     { icon: '🌤️', text: language === 'hi' ? 'मौसम की जानकारी' : 'Weather Info', color: 'blue' },
                     { icon: '🌱', text: language === 'hi' ? 'फसल सलाह' : 'Crop Advice', color: 'green' },
@@ -634,6 +672,20 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Floating Plant Health Button */}
+      {messages.length > 0 && (
+        <button
+          onClick={() => router.push('/plant-health')}
+          className="fixed bottom-24 right-6 bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-full shadow-2xl hover:from-green-700 hover:to-green-800 hover:scale-110 transition-all z-50 group"
+          title={language === 'hi' ? 'पौधे स्वास्थ्य परीक्षण' : 'Plant Health Testing'}
+        >
+          <Leaf className="w-6 h-6" />
+          <span className="absolute -top-1 -right-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">
+            {language === 'hi' ? 'नया' : 'NEW'}
+          </span>
+        </button>
+      )}
 
       {/* Language Modal */}
       {showLanguageModal && (
