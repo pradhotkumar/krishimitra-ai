@@ -38,6 +38,20 @@ const getThemeGradient = (theme: string) => {
   }
 };
 
+const staggerContainer = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export default function HomePage() {
   const router = useRouter();
   const { scrollY } = useScroll();
@@ -72,116 +86,12 @@ export default function HomePage() {
               className="object-cover grayscale saturate-50"
               priority
             />
-<<<<<<< HEAD
-            <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 via-green-800/85 to-green-900/90" />
-          </div>
-
-          {/* Floating Orb Animation */}
-          <motion.div
-            className="absolute top-20 right-20 w-64 h-64 bg-green-400/20 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-
-          {/* Hero Content */}
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Sparkles className="w-4 h-4 text-green-300" />
-                <span className="text-white text-sm font-medium">AI-Powered Agriculture Platform</span>
-              </motion.div>
-
-              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                <span className="block">KrishiMitra AI</span>
-                <span className="block text-green-300 mt-2">Your Smart Farming Partner</span>
-              </h1>
-
-              <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-                Get instant crop guidance, weather intelligence, market insights, and government schemes 
-                information powered by advanced AI technology
-              </p>
-
-              <motion.div
-                className="flex flex-col sm:flex-row gap-4 justify-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <Link
-                  href="/auth"
-                  className="group px-8 py-4 bg-white text-green-700 rounded-full text-lg font-semibold hover:bg-green-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 inline-flex items-center gap-2"
-                >
-                  <MessageSquare className="w-5 h-5" />
-                  Start Chatting
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </Link>
-                <Link
-                  href="/voice-helpline"
-                  className="px-8 py-4 bg-green-600/20 backdrop-blur-sm text-white rounded-full text-lg font-semibold hover:bg-green-600/30 transition-all border-2 border-white/30 hover:border-white/50 hover:scale-105 inline-flex items-center gap-2"
-                >
-                  <Phone className="w-5 h-5" />
-                  Voice Helpline
-                </Link>
-              </motion.div>
-
-              {/* Trust Indicators */}
-              <motion.div
-                className="mt-12 flex flex-wrap justify-center gap-8 text-white/80"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
-                  <span>24/7 Available</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
-                  <span>12 Indian Languages</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
-                  <span>Google Gemini AI</span>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-              <motion.div
-                className="w-1.5 h-1.5 bg-white rounded-full mt-2"
-                animate={{ y: [0, 16, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </div>
-=======
->>>>>>> dee5727 (feat(ui): apply liquid glass spatial design and theme engine)
+            <div className="absolute inset-0 bg-background-primary opacity-40 mix-blend-multiply" />
           </motion.div>
 
+          {/* Liquid Glass Hero Content */}
           <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center delay-1 animate-glass-reveal opacity-0">
-            <div className="inline-flex items-center gap-2 px-5 py-2 glass-tier-2 rounded-pill interactive-glass glass-specular mb-8 border border-white/20 hover:border-glassTint-mint/50">
+            <div className="inline-flex items-center gap-2 px-5 py-2 glass-tier-2 rounded-full interactive-glass glass-specular mb-8 border border-white/20 hover:border-glassTint-mint/50">
               <Sparkles className="w-5 h-5 text-glassTint-mint" />
               <span className="text-text-primary text-sm font-semibold tracking-wide">Next-Gen Agricultural AI</span>
             </div>
@@ -191,146 +101,42 @@ export default function HomePage() {
               <span className={`text-transparent bg-clip-text bg-gradient-to-r ${getThemeGradient(theme)} transition-all duration-1000`}>Smart Farming.</span>
             </h1>
 
-            <p className="text-body text-text-secondary text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-light">
+            <p className="text-body text-text-secondary text-xl md:text-2xl mb-12 max-w-2xl mx-auto font-light leading-relaxed">
               Experience the power of precise crop guidance, weather intelligence, and live market insights—all processed with blazing fast AI.
             </p>
 
-<<<<<<< HEAD
-              {/* Feature Card 3 */}
-              <motion.div
-                variants={fadeInUp}
-                whileHover={{ scale: 1.03, y: -5 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8">
+              <Link
+                href="/auth"
+                className="group flex items-center justify-center gap-3 px-8 py-4 glass-tier-3 rounded-full border border-white/20 font-bold text-lg text-text-primary interactive-glass glass-specular hover:scale-105 active:scale-95 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] apple-focus"
               >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=600&q=80"
-                    alt="Market Prices"
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <TrendingUp className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Live Market Prices</h3>
-                  <p className="text-gray-600 mb-4">
-                    Get real-time mandi prices, market trends, and sell your produce 
-                    at the best rates.
-                  </p>
-                  <Link
-                    href="/marketplace"
-                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
-                  >
-                    View Marketplace
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </Link>
-                </div>
-              </motion.div>
+                <MessageSquare className="w-5 h-5" />
+                <span>Begin Session</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity -ml-6 group-hover:ml-0 group-hover:block hidden">→</span>
+              </Link>
 
-              {/* Feature Card 4 */}
-              <motion.div
-                variants={fadeInUp}
-                whileHover={{ scale: 1.03, y: -5 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              <Link
+                href="/voice-helpline"
+                className="group flex items-center justify-center gap-3 px-8 py-4 glass-tier-1 rounded-full border border-white/10 font-bold text-lg text-text-secondary interactive-glass hover:text-text-primary hover:border-white/30 transition-all apple-focus"
               >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600&q=80"
-                    alt="Voice Helpline"
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <Phone className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Voice Helpline</h3>
-                  <p className="text-gray-600 mb-4">
-                    Call our toll-free number and speak in Hindi. No internet or 
-                    smartphone needed.
-                  </p>
-                  <Link
-                    href="/voice-helpline"
-                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
-                  >
-                    Learn More
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </Link>
-                </div>
-              </motion.div>
+                <Phone className="w-5 h-5 opacity-70" />
+                <span>Voice Helpline</span>
+              </Link>
+            </div>
 
-              {/* Feature Card 5 */}
-              <motion.div
-                variants={fadeInUp}
-                whileHover={{ scale: 1.03, y: -5 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&q=80"
-                    alt="Crop Guidance"
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <Sparkles className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Crop Guidance</h3>
-                  <p className="text-gray-600 mb-4">
-                    Expert advice on crop selection, sowing, irrigation, and pest 
-                    management powered by AI.
-                  </p>
-                  <Link
-                    href="/auth"
-                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
-                  >
-                    Get Started
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </Link>
-                </div>
-              </motion.div>
-
-              {/* Feature Card 6 */}
-              <motion.div
-                variants={fadeInUp}
-                whileHover={{ scale: 1.03, y: -5 }}
-                className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80"
-                    alt="Government Schemes"
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <Shield className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Government Schemes</h3>
-                  <p className="text-gray-600 mb-4">
-                    Find and apply for government schemes, subsidies, and benefits 
-                    available for farmers.
-                  </p>
-                  <Link
-                    href="/auth"
-                    className="text-green-600 font-semibold hover:text-green-700 inline-flex items-center gap-1 group"
-                  >
-                    Explore Schemes
-                    <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </Link>
-                </div>
-              </motion.div>
+            {/* Scroll Indicator */}
+            <motion.div
+              className="absolute -bottom-24 left-1/2 transform -translate-x-1/2"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center backdrop-blur-md">
+                <motion.div
+                  className="w-1.5 h-1.5 bg-white/70 rounded-full mt-2 shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                  animate={{ y: [0, 16, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </div>
             </motion.div>
           </div>
         </section>
@@ -499,22 +305,15 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-600 to-green-800 text-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Ready to Transform Your Farming?
-              </h2>
-              <p className="text-xl text-green-100 mb-8">
-                Join thousands of farmers using AI to make smarter decisions
-              </p>
-=======
+        <section className="py-32 relative z-20">
+          <div className="max-w-4xl mx-auto px-4 text-center delay-1 animate-glass-reveal opacity-0">
+            <h2 className="text-display text-text-primary mb-6 text-4xl md:text-6xl text-vibrancy">
+              Ready to Transform Your Farming?
+            </h2>
+            <p className="text-body text-text-secondary text-xl max-w-2xl mx-auto mb-12">
+              Join thousands of farmers using AI-driven spatial tools to make smarter decisions.
+            </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
->>>>>>> dee5727 (feat(ui): apply liquid glass spatial design and theme engine)
               <Link
                 href="/auth"
                 className="group px-8 py-4 glass-tier-2 text-text-primary rounded-pill text-title text-lg hover:scale-105 transition-all interactive-glass glass-specular inline-flex items-center gap-2 shadow-[0_0_40px_rgba(255,255,255,0.05)]"

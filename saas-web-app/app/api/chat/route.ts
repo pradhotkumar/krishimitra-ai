@@ -82,12 +82,12 @@ function generateIntelligentResponse(message: string, lang: string, context: any
   // Validate language code and default to Hindi if not supported
   const supportedLanguages = ['hi', 'en', 'ta', 'te', 'kn', 'ml', 'mr', 'gu', 'bn', 'pa', 'or', 'as'];
   const language = supportedLanguages.includes(lang) ? lang : 'hi';
-  
+
   const lowerMessage = message.toLowerCase();
 
   // Weather-related queries
-  if (lowerMessage.includes('weather') || lowerMessage.includes('मौसम') || lowerMessage.includes('வானிலை') || 
-      lowerMessage.includes('వాతావరణం') || lowerMessage.includes('ಹವಾಮಾನ') || lowerMessage.includes('കാലാവസ്ഥ')) {
+  if (lowerMessage.includes('weather') || lowerMessage.includes('मौसम') || lowerMessage.includes('வானிலை') ||
+    lowerMessage.includes('వాతావరణం') || lowerMessage.includes('ಹವಾಮಾನ') || lowerMessage.includes('കാലാവസ്ഥ')) {
     const weatherResponses: { [key: string]: string } = {
       hi: 'मौसम की जानकारी के लिए, कृपया होमपेज पर "Live Weather Dashboard" देखें। आप अपना क्षेत्र दर्ज करके वर्तमान मौसम देख सकते हैं।',
       en: 'For weather information, please check the "Live Weather Dashboard" on the homepage. You can enter your region to see current weather.',
@@ -106,8 +106,8 @@ function generateIntelligentResponse(message: string, lang: string, context: any
   }
 
   // Crop-related queries
-  if (lowerMessage.includes('crop') || lowerMessage.includes('फसल') || lowerMessage.includes('பயிர்') || 
-      lowerMessage.includes('పంట') || lowerMessage.includes('ಬೆಳೆ') || lowerMessage.includes('വിള')) {
+  if (lowerMessage.includes('crop') || lowerMessage.includes('फसल') || lowerMessage.includes('பயிர்') ||
+    lowerMessage.includes('పంట') || lowerMessage.includes('ಬೆಳೆ') || lowerMessage.includes('വിള')) {
     const cropResponses: { [key: string]: string } = {
       hi: 'फसल की सलाह के लिए, मुझे बताएं:\n1. आपका क्षेत्र/जिला\n2. मिट्टी का प्रकार\n3. कौन सी फसल उगाना चाहते हैं\n\nमैं आपको बुवाई, सिंचाई और उर्वरक की जानकारी दूंगी।',
       en: 'For crop advice, please tell me:\n1. Your region/district\n2. Soil type\n3. Which crop you want to grow\n\nI will provide information about sowing, irrigation, and fertilizers.',
@@ -126,8 +126,8 @@ function generateIntelligentResponse(message: string, lang: string, context: any
   }
 
   // Market price queries
-  if (lowerMessage.includes('price') || lowerMessage.includes('market') || lowerMessage.includes('भाव') || 
-      lowerMessage.includes('मंडी') || lowerMessage.includes('விலை') || lowerMessage.includes('ధర')) {
+  if (lowerMessage.includes('price') || lowerMessage.includes('market') || lowerMessage.includes('भाव') ||
+    lowerMessage.includes('मंडी') || lowerMessage.includes('விலை') || lowerMessage.includes('ధర')) {
     const priceResponses: { [key: string]: string } = {
       hi: 'बाजार भाव की जानकारी के लिए, कृपया होमपेज पर "Live Mandi Prices" देखें। आप अपने क्षेत्र की मंडी के ताजा भाव देख सकते हैं।',
       en: 'For market prices, please check "Live Mandi Prices" on the homepage. You can see the latest prices from your local mandi.',
@@ -146,5 +146,5 @@ function generateIntelligentResponse(message: string, lang: string, context: any
   }
 
   // Default greeting
-  return responses.greeting[language] || responses.greeting['hi'];
+  return responses.greeting[language as keyof typeof responses.greeting] || responses.greeting['hi'];
 }
