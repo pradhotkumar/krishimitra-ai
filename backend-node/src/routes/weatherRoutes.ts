@@ -1,24 +1,18 @@
-import express, { Request, Response } from "express";
+import axios from "axios";
 
-const router = express.Router();
+const API_KEY = "62c70ac3a9fe7950bfdcc62f44c8de72";
 
-router.get("/weather", (req: Request, res: Response) => {
+export async function getWeather(location: string) {
 
-  const location = (req.query.location as string) || "Unknown";
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${API_KEY}&units=metric`;
 
-  const weatherData = {
+  const response = await axios.get(url);
+
+  return {
     location,
-    temperature: 28,
-    humidity: 65,
-    conditions: "Sunny",
-    wind_speed: 12
+    temperature: response.data.main.temp,
+    humidity: response.data.main.humidity,
+    conditions: response.data.weather[0].description,
+    wind_speed: response.data.wind.speed
   };
-
-  res.status(200).json({
-    success: true,
-    data: weatherData
-  });
-
-});
-
-export default router;
+}
