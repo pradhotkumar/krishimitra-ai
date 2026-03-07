@@ -45,7 +45,7 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Contact Form */}
-            <div className="glass p-8 rounded-lg shadow-soft">
+            <div className="bg-white/95 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-primary/10">
               <h2 className="text-2xl font-semibold text-primary mb-6">Send us a message</h2>
               
               {submitStatus === 'success' && (
@@ -58,7 +58,7 @@ export default function ContactPage() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                     Name *
                   </label>
                   <input
@@ -66,13 +66,13 @@ export default function ContactPage() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-primary/20 focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 rounded-lg border border-primary/30 bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                     Email *
                   </label>
                   <input
@@ -80,13 +80,13 @@ export default function ContactPage() {
                     id="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-primary/20 focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 rounded-lg border border-primary/30 bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                     Phone (Optional)
                   </label>
                   <input
@@ -94,12 +94,12 @@ export default function ContactPage() {
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-primary/20 focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 rounded-lg border border-primary/30 bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-text mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
                     Message * (min 10 characters)
                   </label>
                   <textarea
@@ -107,17 +107,17 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={5}
-                    className="w-full px-4 py-2 rounded-lg border border-primary/20 focus:outline-none focus:border-primary"
+                    className="w-full px-4 py-2 rounded-lg border border-primary/30 bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                     required
                     minLength={10}
                   />
-                  <p className="text-xs text-text/50 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     {formData.message.length} / 10 characters minimum
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Preferred Language
                   </label>
                   <div className="flex gap-2">
@@ -158,35 +158,35 @@ export default function ContactPage() {
 
             {/* Contact Information */}
             <div className="space-y-6">
-              <div className="glass p-8 rounded-lg shadow-soft">
+              <div className="bg-white/95 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-primary/10">
                 <h2 className="text-2xl font-semibold text-primary mb-6">Get in Touch</h2>
                 <div className="space-y-4">
-                  <div>
+                  <div className="bg-gradient-to-br from-blue-50 to-white p-4 rounded-lg border border-blue-100">
                     <h3 className="font-semibold text-primary mb-2">📧 Email</h3>
-                    <p className="text-text/70">support@krishimitra.ai</p>
+                    <p className="text-gray-700">support@krishimitra.ai</p>
                   </div>
-                  <div>
+                  <div className="bg-gradient-to-br from-green-50 to-white p-4 rounded-lg border border-green-100">
                     <h3 className="font-semibold text-primary mb-2">📞 Voice Helpline</h3>
-                    <p className="text-text/70">1800-XXX-XXXX (Toll-free)</p>
-                    <p className="text-sm text-text/50">Available 24/7</p>
+                    <p className="text-gray-700">1800-XXX-XXXX (Toll-free)</p>
+                    <p className="text-sm text-gray-600">Available 24/7</p>
                   </div>
-                  <div>
+                  <div className="bg-gradient-to-br from-purple-50 to-white p-4 rounded-lg border border-purple-100">
                     <h3 className="font-semibold text-primary mb-2">🌐 Web Chat</h3>
-                    <p className="text-text/70">Available on our chat dashboard</p>
+                    <p className="text-gray-700">Available on our chat dashboard</p>
                   </div>
                 </div>
               </div>
 
-              <div className="glass p-8 rounded-lg shadow-soft">
+              <div className="bg-white/95 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-primary/10">
                 <h3 className="font-semibold text-primary mb-4">Office Hours</h3>
-                <p className="text-text/70 mb-2">Monday - Friday: 9:00 AM - 6:00 PM IST</p>
-                <p className="text-text/70 mb-4">Saturday - Sunday: 10:00 AM - 4:00 PM IST</p>
-                <p className="text-sm text-text/50">
+                <p className="text-gray-700 mb-2">Monday - Friday: 9:00 AM - 6:00 PM IST</p>
+                <p className="text-gray-700 mb-4">Saturday - Sunday: 10:00 AM - 4:00 PM IST</p>
+                <p className="text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
                   Note: AI chat and voice helpline are available 24/7
                 </p>
               </div>
 
-              <div className="glass p-8 rounded-lg shadow-soft">
+              <div className="bg-white/95 backdrop-blur-sm p-8 rounded-lg shadow-lg border border-primary/10">
                 <h3 className="font-semibold text-primary mb-4">Follow Us</h3>
                 <div className="flex gap-4">
                   <a href="#" className="text-primary hover:scale-110 transition-transform">

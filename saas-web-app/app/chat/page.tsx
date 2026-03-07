@@ -92,20 +92,55 @@ export default function ChatPage() {
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.continuous = false; // Don't keep listening continuously
+      recognitionRef.current.interimResults = true; // Show results as you speak
 
       recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        setIsListening(false);
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        // Update input with final + interim text
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+        } else if (interimTranscript) {
+          // Show interim results in real-time
+          setInput(prev => {
+            const lastSpace = prev.lastIndexOf(' ');
+            const base = lastSpace > 0 ? prev.substring(0, lastSpace + 1) : '';
+            return base + interimTranscript;
+          });
+        }
       };
 
-      recognitionRef.current.onerror = () => {
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
         setIsListening(false);
+        
+        if (event.error === 'no-speech') {
+          // Stop on no-speech
+          console.log('No speech detected, stopping...');
+        } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          alert(language === 'hi'
+            ? 'माइक्रोफ़ोन एक्सेस अस्वीकृत। कृपया ब्राउज़र सेटिंग्स में अनुमति दें।'
+            : 'Microphone access denied. Please allow access in browser settings.');
+        } else if (event.error === 'network') {
+          alert(language === 'hi'
+            ? 'नेटवर्क त्रुटि। कृपया अपना इंटरनेट कनेक्शन जांचें।'
+            : 'Network error. Please check your internet connection.');
+        }
       };
 
       recognitionRef.current.onend = () => {
+        // Always stop when recognition ends
         setIsListening(false);
       };
     }
@@ -116,6 +151,15 @@ export default function ChatPage() {
       recognitionRef.current.lang = getCurrentLanguage().speechCode;
     }
   }, [language]);
+
+  // Cleanup: Stop microphone when component unmounts
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [isListening]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -155,17 +199,29 @@ export default function ChatPage() {
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
-      alert('Voice input is not supported in your browser');
+      alert(language === 'hi' 
+        ? 'आपका ब्राउज़र वॉइस इनपुट का समर्थन नहीं करता। कृपया Chrome या Edge का उपयोग करें।'
+        : 'Voice input is not supported in your browser. Please use Chrome or Edge.');
       return;
     }
 
     if (isListening) {
+      // Stop listening
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      recognitionRef.current.lang = getCurrentLanguage().speechCode;
-      recognitionRef.current.start();
-      setIsListening(true);
+      // Start listening
+      try {
+        recognitionRef.current.lang = getCurrentLanguage().speechCode;
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error('Speech recognition error:', error);
+        alert(language === 'hi'
+          ? 'माइक्रोफ़ोन शुरू करने में त्रुटि। कृपया फिर से प्रयास करें।'
+          : 'Error starting microphone. Please try again.');
+        setIsListening(false);
+      }
     }
   };
 
@@ -323,14 +379,14 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-900">
       {/* Sidebar */}
-      <aside className={`${showSidebar ? 'w-64' : 'w-0'} bg-gray-900 text-white transition-all duration-300 overflow-hidden flex flex-col`}>
+      <aside className={`${showSidebar ? 'w-64' : 'w-0'} bg-gray-950 text-white transition-all duration-300 overflow-hidden flex flex-col border-r border-gray-800`}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-700">
+        <div className="p-4 border-b border-gray-800">
           <button
             onClick={createNewChat}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-white"
           >
             <Plus className="w-5 h-5" />
             <span className="font-medium">New Chat</span>
@@ -349,9 +405,9 @@ export default function ChatPage() {
               }`}
             >
               <div className="flex items-start gap-2">
-                <MessageSquare className="w-4 h-4 mt-1 flex-shrink-0" />
+                <MessageSquare className="w-4 h-4 mt-1 flex-shrink-0 text-gray-400" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{session.title}</p>
+                  <p className="text-sm font-medium truncate text-white">{session.title}</p>
                   <p className="text-xs text-gray-400 truncate">{session.lastMessage}</p>
                 </div>
               </div>
@@ -360,7 +416,7 @@ export default function ChatPage() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-gray-700 space-y-2">
+        <div className="p-3 border-t border-gray-800 space-y-2">
           <button
             onClick={() => router.push('/dashboard/farmer')}
             className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-800 rounded-lg transition-colors"
@@ -395,38 +451,38 @@ export default function ChatPage() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-white border-b px-4 py-3 flex items-center justify-between">
+        <header className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowSidebar(!showSidebar)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors text-white"
             >
               {showSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">KrishiMitra AI</h1>
-              <p className="text-xs text-gray-500">Your farming assistant</p>
+              <h1 className="text-lg font-semibold text-white">KrishiMitra AI</h1>
+              <p className="text-xs text-gray-400">Your farming assistant</p>
             </div>
           </div>
           
           <button
             onClick={() => setShowLanguageModal(true)}
-            className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
           >
             {getCurrentLanguage().name}
           </button>
         </header>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-900">
           <div className="max-w-3xl mx-auto space-y-6">
             {messages.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-7xl mb-6 animate-bounce">🌾</div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                <h2 className="text-3xl font-bold text-white mb-3">
                   {language === 'hi' ? 'नमस्ते!' : 'Hello!'} {userName}
                 </h2>
-                <p className="text-xl text-gray-600 mb-8">
+                <p className="text-xl text-gray-300 mb-8">
                   {language === 'hi' 
                     ? 'मैं कृषिमित्र हूं, आपकी कृषि सहायक। मुझसे कुछ भी पूछें!'
                     : 'I\'m KrishiMitra, your farming assistant. Ask me anything!'}
@@ -434,7 +490,7 @@ export default function ChatPage() {
                 
                 {/* Suggestion Chips */}
                 <div className="mb-8">
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-gray-400 mb-4">
                     {language === 'hi' ? 'लोकप्रिय प्रश्न:' : 'Popular Questions:'}
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center max-w-3xl mx-auto">
@@ -456,7 +512,7 @@ export default function ChatPage() {
                       <button
                         key={idx}
                         onClick={() => setInput(suggestion)}
-                        className="px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium hover:bg-green-100 hover:scale-105 transition-all border border-green-200"
+                        className="px-4 py-2 bg-gray-800 text-gray-200 rounded-full text-sm font-medium hover:bg-gray-700 hover:scale-105 transition-all border border-gray-700"
                       >
                         {suggestion}
                       </button>
@@ -475,10 +531,10 @@ export default function ChatPage() {
                     <button
                       key={idx}
                       onClick={() => setInput(item.text)}
-                      className="group flex items-center gap-4 p-5 bg-white border-2 border-gray-200 rounded-2xl hover:border-green-500 hover:shadow-lg hover:scale-105 transition-all text-left"
+                      className="group flex items-center gap-4 p-5 bg-gray-800 border-2 border-gray-700 rounded-2xl hover:border-green-500 hover:shadow-lg hover:scale-105 transition-all text-left"
                     >
                       <div className="text-4xl group-hover:scale-110 transition-transform">{item.icon}</div>
-                      <span className="font-semibold text-gray-800 group-hover:text-green-600 transition-colors">{item.text}</span>
+                      <span className="font-semibold text-gray-200 group-hover:text-green-400 transition-colors">{item.text}</span>
                     </button>
                   ))}
                 </div>
@@ -494,11 +550,11 @@ export default function ChatPage() {
                       className={`max-w-[80%] rounded-2xl px-6 py-4 shadow-md ${
                         msg.role === 'user'
                           ? 'bg-gradient-to-br from-green-600 to-green-700 text-white'
-                          : 'bg-white border border-gray-200 text-gray-900'
+                          : 'bg-gray-800 border border-gray-700 text-gray-100'
                       }`}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                      <p className={`text-xs mt-2 ${msg.role === 'user' ? 'text-green-100' : 'text-gray-400'}`}>
+                      <p className={`text-xs mt-2 ${msg.role === 'user' ? 'text-green-100' : 'text-gray-500'}`}>
                         {msg.timestamp.toLocaleTimeString()}
                       </p>
                     </div>
@@ -506,11 +562,11 @@ export default function ChatPage() {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white border border-gray-200 rounded-2xl px-6 py-4">
+                    <div className="bg-gray-800 border border-gray-700 rounded-2xl px-6 py-4">
                       <div className="flex space-x-2">
-                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce delay-100" />
-                        <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce delay-200" />
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-100" />
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-200" />
                       </div>
                     </div>
                   </div>
@@ -522,17 +578,25 @@ export default function ChatPage() {
         </div>
 
         {/* Input Area */}
-        <div className="bg-white border-t p-4">
+        <div className="bg-gray-800 border-t border-gray-700 p-4">
           <div className="max-w-3xl mx-auto">
+            {isListening && (
+              <div className="mb-3 flex items-center justify-center gap-2 text-red-400 animate-pulse">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                <span className="text-sm font-medium">
+                  {language === 'hi' ? 'सुन रहा हूं... बोलें' : 'Listening... Speak now'}
+                </span>
+              </div>
+            )}
             <div className="flex gap-3 items-end">
               <button
                 onClick={toggleVoiceInput}
-                className={`p-3 rounded-xl transition-all ${
+                className={`p-3 rounded-xl transition-all flex-shrink-0 ${
                   isListening 
-                    ? 'bg-red-500 text-white animate-pulse' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-red-500 text-white animate-pulse shadow-lg' 
+                    : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
                 }`}
-                title={language === 'hi' ? 'आवाज से बोलें' : 'Voice Input'}
+                title={language === 'hi' ? (isListening ? 'रोकें' : 'आवाज से बोलें') : (isListening ? 'Stop' : 'Voice Input')}
               >
                 <Mic className="w-5 h-5" />
               </button>
@@ -548,7 +612,7 @@ export default function ChatPage() {
                     }
                   }}
                   placeholder={language === 'hi' ? 'अपना सवाल पूछें...' : 'Ask your question...'}
-                  className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-green-500 resize-none"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-700 border-2 border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-green-500 resize-none"
                   rows={1}
                   disabled={isLoading}
                 />
@@ -562,7 +626,7 @@ export default function ChatPage() {
                 <Send className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 text-center mt-2">
+            <p className="text-xs text-gray-400 text-center mt-2">
               {language === 'hi'
                 ? 'कृषिमित्र AI गलतियाँ कर सकती है। महत्वपूर्ण जानकारी की पुष्टि करें।'
                 : 'KrishiMitra AI can make mistakes. Verify important information.'}
