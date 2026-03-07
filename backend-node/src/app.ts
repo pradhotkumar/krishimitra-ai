@@ -12,6 +12,8 @@ import chatRoutes from './routes/chatRoutes';
 import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
 import adminRoutes from './routes/adminRoutes';
+import weatherRoutes from "./routes/weatherRoutes";
+
 
 const app = express();
 
@@ -66,6 +68,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', weatherRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
