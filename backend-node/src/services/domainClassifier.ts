@@ -93,10 +93,20 @@ export class DomainClassifier {
     // Input validation
     if (!normalizedInput || normalizedInput.length === 0) {
       return {
-        domainStatus: 'rejected',
-        classification: 'non_agriculture',
-        confidence: 1.0,
-        redirectMessage: 'Please provide a valid question about agriculture.'
+        domainStatus: 'agriculture',
+        classification: 'agriculture_crop',
+        confidence: 0.5,
+        redirectMessage: undefined
+      };
+    }
+
+    // Handle greetings and general queries - treat as agriculture
+    const greetings = ['hello', 'hi', 'hey', 'namaste', 'namaskar', 'good morning', 'good afternoon', 'good evening'];
+    if (greetings.some(greeting => normalizedInput === greeting || normalizedInput.startsWith(greeting + ' '))) {
+      return {
+        domainStatus: 'agriculture',
+        classification: 'agriculture_crop',
+        confidence: 0.8
       };
     }
 
@@ -134,7 +144,17 @@ export class DomainClassifier {
       };
     }
 
-    // LAYER 3: Smart Redirection Logic
+    // For ambiguous queries, assume agriculture context (be permissive)
+    // Let Bedrock handle the response intelligently
+    if (normalizedInput.length < 50) {
+      return {
+        domainStatus: 'agriculture',
+        classification: 'agriculture_crop',
+        confidence: 0.6
+      };
+    }
+
+    // LAYER 3: Smart Redirection Logic (only for clearly non-agriculture)
     return this.layer3SmartRedirection(normalizedInput);
   }
 
