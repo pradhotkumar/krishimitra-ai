@@ -145,7 +145,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-300" />
-                  <span>Powered by AWS</span>
+                  <span>Google Gemini AI</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -498,7 +498,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* AWS Architecture Section */}
+        {/* Technology Stack Section */}
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -508,10 +508,10 @@ export default function HomePage() {
               className="text-center mb-16"
             >
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Built on Enterprise-Grade AWS Cloud
+                Powered by Advanced AI & Cloud Technology
               </h2>
               <p className="text-xl text-gray-600">
-                Secure, scalable, and reliable infrastructure
+                Secure, scalable, and intelligent infrastructure
               </p>
             </motion.div>
 
@@ -523,14 +523,14 @@ export default function HomePage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-6"
             >
               {[
-                { icon: '🧠', name: 'Amazon Bedrock', desc: 'AI Models' },
-                { icon: '⚡', name: 'AWS Lambda', desc: 'Serverless' },
-                { icon: '🔌', name: 'API Gateway', desc: 'RESTful APIs' },
-                { icon: '💾', name: 'DynamoDB', desc: 'Database' },
-                { icon: '📦', name: 'Amazon S3', desc: 'Storage' },
+                { icon: '🤖', name: 'Google Gemini', desc: 'AI Intelligence' },
+                { icon: '☁️', name: 'AWS EC2', desc: 'Cloud Compute' },
+                { icon: '🗄️', name: 'PostgreSQL', desc: 'Database' },
+                { icon: '🚀', name: 'AWS Amplify', desc: 'Frontend Hosting' },
                 { icon: '📞', name: 'Amazon Connect', desc: 'Voice Calls' },
-                { icon: '🗣️', name: 'Amazon Lex', desc: 'Chatbot' },
-                { icon: '🚀', name: 'AWS Amplify', desc: 'Hosting' },
+                { icon: '🗣️', name: 'Amazon Lex', desc: 'Voice Bot' },
+                { icon: '🌐', name: 'Nginx', desc: 'Web Server' },
+                { icon: '⚡', name: 'Node.js', desc: 'Backend API' },
               ].map((service, index) => (
                 <motion.div
                   key={index}
@@ -543,6 +543,20 @@ export default function HomePage() {
                   <p className="text-sm text-gray-600">{service.desc}</p>
                 </motion.div>
               ))}
+            </motion.div>
+
+            {/* AI Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-12 text-center"
+            >
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg">
+                <Sparkles className="w-5 h-5" />
+                <span className="font-semibold">Powered by Google Gemini Pro AI</span>
+              </div>
             </motion.div>
           </div>
         </section>
