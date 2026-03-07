@@ -2,14 +2,14 @@
  * BhoomiEngine - Complete Agriculture Intelligence Engine
  * 
  * Central orchestrator for all AI interactions in KrishiMitra AI
- * Integrates: Domain Classification, AWS Lex, Recommendations, Alerts, Learning
+ * Integrates: Domain Classification, AWS Bedrock, Recommendations, Alerts, Learning
  * 
  * This is the ONLY entry point for all AI operations
  * NO direct service calls allowed from routes
  */
 
 import domainClassifier, { DomainStatus, IntentClassification } from './domainClassifier';
-import awsLexService from './awsLexService';
+import awsBedrockService from './awsBedrockService';
 import recommendationEngine, { ProductRecommendation } from './recommendationEngine';
 import alertEngine, { Alert } from './alertEngine';
 import learningEngine, { LearningInsight } from './learningEngine';
@@ -111,16 +111,16 @@ export class BhoomiEngine {
 
       // STEP 5: Agriculture query - full processing pipeline
       
-      // 5a. Get AI response from Lex
+      // 5a. Get AI response from Bedrock (Claude 3 Haiku)
       try {
-        const lexResponse = await awsLexService.sendMessageToLex(
+        const bedrockResponse = await awsBedrockService.sendMessageToBedrock(
           sanitizedInput,
           request.userId,
           classificationResult.classification
         );
-        aiResponse = lexResponse.message;
+        aiResponse = bedrockResponse.message;
       } catch (error) {
-        console.error('Lex service error:', error);
+        console.error('Bedrock service error:', error);
         aiResponse = 'I apologize, but I encountered an issue processing your request. Please try again.';
       }
 
@@ -412,7 +412,7 @@ export class BhoomiEngine {
     engine: string;
     services: {
       domainClassifier: string;
-      awsLex: string;
+      awsBedrock: string;
       recommendationEngine: string;
       alertEngine: string;
       learningEngine: string;
@@ -425,7 +425,7 @@ export class BhoomiEngine {
       engine: 'BhoomiEngine v1.0',
       services: {
         domainClassifier: 'active',
-        awsLex: 'active',
+        awsBedrock: 'active',
         recommendationEngine: 'active',
         alertEngine: 'active',
         learningEngine: 'active',
