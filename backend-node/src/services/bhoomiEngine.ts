@@ -9,7 +9,7 @@
  */
 
 import domainClassifier, { DomainStatus, IntentClassification } from './domainClassifier';
-import awsBedrockService from './awsBedrockService';
+import googleGeminiService from './googleGeminiService';
 import recommendationEngine, { ProductRecommendation } from './recommendationEngine';
 import alertEngine, { Alert } from './alertEngine';
 import learningEngine, { LearningInsight } from './learningEngine';
@@ -111,16 +111,16 @@ export class BhoomiEngine {
 
       // STEP 5: Agriculture query - full processing pipeline
       
-      // 5a. Get AI response from Bedrock (Claude 3 Haiku)
+      // 5a. Get AI response from Google Gemini
       try {
-        const bedrockResponse = await awsBedrockService.sendMessageToBedrock(
+        const geminiResponse = await googleGeminiService.sendMessageToGemini(
           sanitizedInput,
           request.userId,
           classificationResult.classification
         );
-        aiResponse = bedrockResponse.message;
+        aiResponse = geminiResponse.message;
       } catch (error) {
-        console.error('Bedrock service error:', error);
+        console.error('Gemini service error:', error);
         aiResponse = 'I apologize, but I encountered an issue processing your request. Please try again.';
       }
 
