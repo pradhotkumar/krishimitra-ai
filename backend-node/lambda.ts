@@ -1,5 +1,12 @@
-import serverlessHttp from 'serverless-http';
+import serverless from 'serverless-http';
 import app from './src/app';
 
-// Wrap Express app for Lambda
-export const handler = serverlessHttp(app);
+const server = serverless(app);
+
+export const handler = async (event: any, context: any) => {
+  if (event.path) {
+    event.path = event.path.replace(/^\/prod/, '');
+  }
+
+  return server(event, context);
+};
