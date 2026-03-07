@@ -66,7 +66,13 @@ export class GoogleGeminiService {
       });
 
       if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Gemini API HTTP error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        });
+        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
       }
 
       const data: any = await response.json();
@@ -84,7 +90,12 @@ export class GoogleGeminiService {
       };
 
     } catch (error) {
-      console.error('❌ Gemini error:', error);
+      console.error('❌ Gemini error:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        userId,
+        classification
+      });
       
       // Fallback response
       return {
