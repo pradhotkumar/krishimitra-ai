@@ -5,7 +5,7 @@
  * Integrates seamlessly with BhoomiEngine architecture
  */
 
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
+import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
 import { IntentClassification } from './domainClassifier';
 
 interface BedrockResponse {
@@ -20,8 +20,8 @@ export class AWSBedrockService {
   private region: string;
 
   constructor() {
-    this.region = process.env.BEDROCK_REGION || 'us-east-1';
-    this.modelId = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-3-haiku-20240307-v1:0';
+    this.region = process.env.BEDROCK_REGION || 'ap-south-1';
+    this.modelId = process.env.BEDROCK_MODEL_ID || 'arn:aws:bedrock:ap-south-1:268582879394:inference-profile/global.anthropic.claude-sonnet-4-6';
     
     this.client = new BedrockRuntimeClient({
       region: this.region
@@ -43,25 +43,21 @@ export class AWSBedrockService {
   ): Promise<BedrockResponse> {
     try {
       const systemPrompt = this.buildSystemPrompt(classification);
-      const prompt = this.buildPrompt(systemPrompt, userInput);
+      const fullPrompt = `${systemPrompt}\n\nFarmer Question: ${userInput}\n\nYour Response (2-4 sentences, practical and friendly):`;
 
-      const payload = {
-        anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 500,
-        temperature: 0.7,
+      const command = new ConverseCommand({
+        modelId: this.modelId,
         messages: [
           {
             role: "user",
-            content: prompt
+            content: [{ text: fullPrompt }]
           }
-        ]
-      };
-
-      const command = new InvokeModelCommand({
-        modelId: this.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(payload)
+        ],
+        inferenceConfig: {
+          maxTokens: 500,
+          temperature: 0.7,
+          topP: 1
+        }
       });
 
       console.log('🤖 Calling Bedrock:', {
@@ -71,9 +67,7 @@ export class AWSBedrockService {
       });
 
       const response = await this.client.send(command);
-      const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-      
-      const aiMessage = responseBody.content[0].text;
+      const aiMessage = response.output?.message?.content?.[0]?.text || 'Unable to generate response.';
 
       console.log('✅ Bedrock response received:', {
         userId,
@@ -188,17 +182,17 @@ Your Response (2-4 sentences, practical and friendly):`;
   async healthCheck(): Promise<{ status: string; model: string; region: string }> {
     try {
       // Simple test call
-      const testPayload = {
-        anthropic_version: "bedrock-2023-05-31",
-        max_tokens: 10,
-        messages: [{ role: "user", content: "Hi" }]
-      };
-
-      const command = new InvokeModelCommand({
+      const command = new ConverseCommand({
         modelId: this.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(testPayload)
+        messages: [
+          {
+            role: "user",
+            content: [{ text: "Hi" }]
+          }
+        ],
+        inferenceConfig: {
+          maxTokens: 10
+        }
       });
 
       await this.client.send(command);
