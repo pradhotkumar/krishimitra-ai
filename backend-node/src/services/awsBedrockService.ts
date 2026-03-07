@@ -3,10 +3,16 @@
  * 
  * Replaces AWS Lex with Amazon Bedrock for intelligent, natural conversations
  * Integrates seamlessly with BhoomiEngine architecture
+ * 
+ * NOTE: Currently disabled in favor of Google Gemini
  */
 
-import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
+// import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
 import { IntentClassification } from './domainClassifier';
+
+// Placeholder types since AWS SDK is not installed
+type BedrockRuntimeClient = any;
+type ConverseCommand = any;
 
 interface BedrockResponse {
   message: string;
@@ -23,14 +29,10 @@ export class AWSBedrockService {
     this.region = process.env.BEDROCK_REGION || 'ap-south-1';
     this.modelId = process.env.BEDROCK_MODEL_ID || 'arn:aws:bedrock:ap-south-1:268582879394:inference-profile/global.anthropic.claude-sonnet-4-6';
     
-    this.client = new BedrockRuntimeClient({
-      region: this.region
-    });
+    // Bedrock client disabled - using Gemini instead
+    this.client = null as any;
 
-    console.log('✅ AWS Bedrock Service initialized:', {
-      region: this.region,
-      model: this.modelId
-    });
+    console.log('⚠️ AWS Bedrock Service (DISABLED - using Gemini)');
   }
 
   /**
@@ -41,55 +43,13 @@ export class AWSBedrockService {
     userId: string,
     classification: IntentClassification
   ): Promise<BedrockResponse> {
-    try {
-      const systemPrompt = this.buildSystemPrompt(classification);
-      const fullPrompt = `${systemPrompt}\n\nFarmer Question: ${userInput}\n\nYour Response (2-4 sentences, practical and friendly):`;
-
-      const command = new ConverseCommand({
-        modelId: this.modelId,
-        messages: [
-          {
-            role: "user",
-            content: [{ text: fullPrompt }]
-          }
-        ],
-        inferenceConfig: {
-          maxTokens: 500,
-          temperature: 0.7,
-          topP: 1
-        }
-      });
-
-      console.log('🤖 Calling Bedrock:', {
-        userId,
-        classification,
-        inputLength: userInput.length
-      });
-
-      const response = await this.client.send(command);
-      const aiMessage = response.output?.message?.content?.[0]?.text || 'Unable to generate response.';
-
-      console.log('✅ Bedrock response received:', {
-        userId,
-        responseLength: aiMessage.length
-      });
-
-      return {
-        message: aiMessage,
-        confidence: 0.95,
-        intent: classification
-      };
-
-    } catch (error) {
-      console.error('❌ Bedrock error:', error);
-      
-      // Fallback response
-      return {
-        message: this.getFallbackResponse(classification),
-        confidence: 0.5,
-        intent: classification
-      };
-    }
+    // Bedrock is disabled - return fallback
+    console.log('⚠️ Bedrock called but disabled - using fallback');
+    return {
+      message: this.getFallbackResponse(classification),
+      confidence: 0.5,
+      intent: classification
+    };
   }
 
   /**
@@ -180,36 +140,11 @@ Your Response (2-4 sentences, practical and friendly):`;
    * Health check for Bedrock service
    */
   async healthCheck(): Promise<{ status: string; model: string; region: string }> {
-    try {
-      // Simple test call
-      const command = new ConverseCommand({
-        modelId: this.modelId,
-        messages: [
-          {
-            role: "user",
-            content: [{ text: "Hi" }]
-          }
-        ],
-        inferenceConfig: {
-          maxTokens: 10
-        }
-      });
-
-      await this.client.send(command);
-
-      return {
-        status: 'operational',
-        model: this.modelId,
-        region: this.region
-      };
-    } catch (error) {
-      console.error('Bedrock health check failed:', error);
-      return {
-        status: 'error',
-        model: this.modelId,
-        region: this.region
-      };
-    }
+    return {
+      status: 'disabled',
+      model: this.modelId,
+      region: this.region
+    };
   }
 }
 
