@@ -69,7 +69,7 @@ export class GoogleGeminiService {
         throw new Error(`Gemini API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
       const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate response.';
 
       console.log('✅ Gemini response received:', {
