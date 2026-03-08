@@ -15,6 +15,8 @@ import {
   Leaf,
   Camera
 } from 'lucide-react';
+import { useTheme } from '@/components/ThemeProvider';
+import { getThemeGradient, getThemeBg } from '@/lib/theme';
 
 interface Message {
   id: string;
@@ -32,6 +34,7 @@ interface ChatSession {
 
 export default function ChatPage() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [language, setLanguage] = useState<string>('hi');
@@ -136,12 +139,24 @@ export default function ChatPage() {
   }, [language]);
 
   useEffect(() => {
-    return () => {
-      if (recognitionRef.current && isListening) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, [isListening]);
+    if (!isAuthenticated || !currentSessionId) return;
+
+    const savedMessages = localStorage.getItem(`chatMessages_${currentSessionId}`);
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    } else {
+      setMessages([]);
+    }
+  }, [currentSessionId, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !currentSessionId) return;
+
+    // Only save if there are messages, or if we explicitly want to clear
+    if (messages.length > 0) {
+      localStorage.setItem(`chatMessages_${currentSessionId}`, JSON.stringify(messages));
+    }
+  }, [messages, currentSessionId, isAuthenticated]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -272,14 +287,14 @@ export default function ChatPage() {
       <div className="min-h-screen w-full relative z-10 flex flex-col items-center justify-center p-4">
         <div className="max-w-4xl mx-auto w-full text-center mb-12">
           <div className="text-7xl mb-6 animate-bounce">🌾</div>
-          <h1 className="text-display font-bold text-text-primary text-vibrancy mb-4">
+          <h1 className={`text-display font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r ${getThemeGradient(theme)} transition-all duration-1000`}>
             KrishiMitra AI Chat
           </h1>
           <p className="text-title text-text-secondary mb-12 max-w-2xl mx-auto">
             Your intelligent farming assistant. Get expert advice in your language, backed by Liquid Glass precision.
           </p>
 
-          <div className="glass-tier-1 glass-specular rounded-4xl p-10 max-w-2xl mx-auto">
+          <div className="glass-tier-1 glass-specular rounded-[40px] p-10 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-text-primary mb-4">
               Sign in to start chatting
             </h2>
@@ -342,7 +357,7 @@ export default function ChatPage() {
               key={session.id}
               onClick={() => setCurrentSessionId(session.id)}
               className={`w-full text-left px-4 py-3 rounded-2xl transition-all ${currentSessionId === session.id
-                ? 'glass-tier-2 glass-specular'
+                ? `${getThemeBg(theme)} glass-specular shadow-sm`
                 : 'interactive-glass hover:bg-white/5'
                 }`}
             >
@@ -404,7 +419,7 @@ export default function ChatPage() {
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-lg font-bold text-text-primary text-vibrancy">KrishiMitra AI</h1>
+              <h1 className={`text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r ${getThemeGradient(theme)} transition-all duration-500`}>KrishiMitra AI</h1>
               <p className="text-xs text-text-tertiary">Your farming assistant</p>
             </div>
           </div>
@@ -422,7 +437,7 @@ export default function ChatPage() {
             {messages.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-8xl mb-8 animate-float">🌾</div>
-                <h2 className="text-4xl font-bold text-text-primary text-vibrancy mb-4">
+                <h2 className={`text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r ${getThemeGradient(theme)} transition-all duration-1000`}>
                   {language === 'hi' ? 'नमस्ते!' : 'Hello!'} {userName}
                 </h2>
                 <p className="text-xl text-text-secondary mb-12 max-w-xl mx-auto">
@@ -490,14 +505,14 @@ export default function ChatPage() {
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-glass-reveal`}
                   >
                     <div
-                      className={`max-w-[85%] rounded-[28px] px-6 py-4 backdrop-blur-3xl shadow-lg border ${msg.role === 'user'
-                        ? 'bg-white/20 border-white/30 text-white rounded-br-md ml-12'
+                      className={`max-w-[85%] rounded-[28px] px-6 py-4 backdrop-blur-3xl shadow-lg border transition-colors duration-500 ${msg.role === 'user'
+                        ? `${getThemeBg(theme)} text-white rounded-br-md ml-12 glass-specular`
                         : 'glass-tier-1 border-white/10 text-text-primary rounded-bl-md mr-12 glass-specular'
                         }`}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                       <p className={`text-[10px] mt-3 font-medium uppercase tracking-wider ${msg.role === 'user' ? 'text-white/60' : 'text-text-tertiary'}`}>
-                        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
@@ -541,7 +556,7 @@ export default function ChatPage() {
                     }
                   }}
                   placeholder={language === 'hi' ? 'सवाल पूछें...' : 'Ask your question...'}
-                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:bg-white/10 focus:border-white/20 resize-none transition-all custom-scrollbar shadow-inner"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-text-primary placeholder:text-text-tertiary focus:outline-none focus:bg-white/10 focus:border-white/20 resize-none transition-all custom-scrollbar shadow-inner apple-focus focus:ring-1 focus:ring-opacity-50"
                   rows={Math.min(4, Math.max(1, input.split('\\n').length))}
                   disabled={isLoading}
                   style={{ minHeight: '56px', maxHeight: '160px' }}

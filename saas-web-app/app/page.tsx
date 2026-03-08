@@ -22,21 +22,7 @@ import WeatherDashboard from '@/components/WeatherDashboard';
 import MandiDashboard from '@/components/MandiDashboard';
 import { useTheme } from '@/components/ThemeProvider';
 
-const getThemeGradient = (theme: string) => {
-  switch (theme) {
-    case 'spatial-default': return 'from-[#0A84FF] to-[#32D74B] drop-shadow-[0_0_12px_rgba(10,132,255,0.4)]';
-    case 'product-red': return 'from-[#FF3B30] to-[#FF9500] drop-shadow-[0_0_12px_rgba(255,59,48,0.4)]';
-    case 'starlight': return 'from-[#FFD60A] to-[#FFF5D0] drop-shadow-[0_0_12px_rgba(255,214,10,0.4)]';
-    case 'midnight': return 'from-[#5856D6] to-[#0A84FF] drop-shadow-[0_0_12px_rgba(88,86,214,0.4)]';
-    case 'aurora': return 'from-[#30D158] to-[#64D2FF] drop-shadow-[0_0_12px_rgba(48,209,88,0.4)]';
-    case 'deep-space': return 'from-[#5E5CE6] to-[#BF5AF2] drop-shadow-[0_0_12px_rgba(94,92,230,0.4)]';
-    case 'sunset': return 'from-[#FF9500] to-[#FF2D55] drop-shadow-[0_0_12px_rgba(255,149,0,0.4)]';
-    case 'ocean': return 'from-[#64D2FF] to-[#0A84FF] drop-shadow-[0_0_12px_rgba(100,210,255,0.4)]';
-    case 'forest': return 'from-[#32D74B] to-[#FFD60A] drop-shadow-[0_0_12px_rgba(50,215,75,0.4)]';
-    case 'cyber': return 'from-[#FF2D55] to-[#64D2FF] drop-shadow-[0_0_12px_rgba(255,45,85,0.4)]';
-    default: return 'from-[#0A84FF] to-[#32D74B] drop-shadow-[0_0_12px_rgba(10,132,255,0.4)]';
-  }
-};
+import { getThemeGradient } from '@/lib/theme';
 
 const staggerContainer = {
   initial: {},
@@ -142,18 +128,18 @@ export default function HomePage() {
         </section>
 
         {/* Real-Time Weather Intelligence */}
-        <section id="weather" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-          <div className="max-w-7xl mx-auto">
+        <section id="weather" className="py-32 relative z-20 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-20 delay-1 animate-glass-reveal opacity-0"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-display text-text-primary mb-4 text-4xl md:text-5xl text-vibrancy">
                 Real-Time Weather Intelligence
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-body text-text-secondary text-xl">
                 Accurate weather forecasts to plan your farming activities
               </p>
             </motion.div>
@@ -162,25 +148,27 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
+              className="max-w-4xl mx-auto relative delay-3 animate-glass-reveal opacity-0"
             >
+              <div className="absolute inset-x-20 inset-y-10 bg-glassTint-mint opacity-20 blur-[100px] -z-10 rounded-full mix-blend-screen pointer-events-none" />
               <WeatherDashboard />
             </motion.div>
           </div>
         </section>
 
         {/* Real-Time Mandi Prices */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-green-50 to-white">
-          <div className="max-w-7xl mx-auto">
+        <section className="py-32 relative z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-12"
+              className="text-center mb-20 delay-1 animate-glass-reveal opacity-0"
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-display text-text-primary mb-4 text-4xl md:text-5xl text-vibrancy">
                 Live Mandi Prices
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-body text-text-secondary text-xl">
                 Get the latest market prices from mandis across India
               </p>
             </motion.div>
@@ -189,6 +177,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
+              className="max-w-5xl mx-auto relative delay-2 animate-glass-reveal opacity-0"
             >
               <MandiDashboard />
             </motion.div>
@@ -196,18 +185,18 @@ export default function HomePage() {
         </section>
 
         {/* Trust Section with Stats */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-green-700 text-white">
-          <div className="max-w-7xl mx-auto">
+        <section className="py-32 relative z-20 border-y border-white/5 bg-[#05050A]/40 backdrop-blur-3xl">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="text-center mb-16 delay-1 animate-glass-reveal opacity-0"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <h2 className="text-display text-text-primary mb-4 text-4xl md:text-5xl text-vibrancy">
                 Trusted by Farmers Across India
               </h2>
-              <p className="text-xl text-green-100">
+              <p className="text-body text-text-secondary text-xl">
                 Join thousands of farmers using AI to improve their yields
               </p>
             </motion.div>
@@ -217,92 +206,31 @@ export default function HomePage() {
               initial="initial"
               whileInView="animate"
               viewport={{ once: true }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8"
+              className="grid grid-cols-2 md:grid-cols-4 gap-8 delay-2 animate-glass-reveal opacity-0"
             >
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="text-5xl font-bold mb-2">24/7</div>
-                <div className="text-green-100">AI Support</div>
+              <motion.div variants={fadeInUp} className="glass-tier-1 p-6 rounded-[24px] glass-specular interactive-glass text-center hover:-translate-y-2 card-hover transition-all">
+                <div className="text-5xl font-bold mb-2 text-text-primary">24/7</div>
+                <div className="text-label text-text-secondary">AI Support</div>
               </motion.div>
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="text-5xl font-bold mb-2">12</div>
-                <div className="text-green-100">Languages</div>
+              <motion.div variants={fadeInUp} className="glass-tier-1 p-6 rounded-[24px] glass-specular interactive-glass text-center hover:-translate-y-2 card-hover transition-all">
+                <div className="text-5xl font-bold mb-2 text-text-primary">12</div>
+                <div className="text-label text-text-secondary">Languages</div>
               </motion.div>
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="text-5xl font-bold mb-2">100%</div>
-                <div className="text-green-100">Free to Use</div>
+              <motion.div variants={fadeInUp} className="glass-tier-1 p-6 rounded-[24px] glass-specular interactive-glass text-center hover:-translate-y-2 card-hover transition-all">
+                <div className="text-5xl font-bold mb-2 text-text-primary">100%</div>
+                <div className="text-label text-text-secondary">Free to Use</div>
               </motion.div>
-              <motion.div variants={fadeInUp} className="text-center">
-                <div className="text-5xl font-bold mb-2">
-                  <Zap className="w-12 h-12 mx-auto" />
+              <motion.div variants={fadeInUp} className="glass-tier-1 p-6 rounded-[24px] glass-specular interactive-glass text-center hover:-translate-y-2 card-hover transition-all">
+                <div className="text-5xl font-bold mb-2 text-text-primary flex justify-center">
+                  <Zap className="w-12 h-12 text-text-primary" />
                 </div>
-                <div className="text-green-100">Instant Answers</div>
+                <div className="text-label text-text-secondary">Instant Answers</div>
               </motion.div>
             </motion.div>
           </div>
         </section>
 
-        {/* Technology Stack Section */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Powered by Advanced AI & Cloud Technology
-              </h2>
-              <p className="text-xl text-gray-600">
-                Secure, scalable, and intelligent infrastructure
-              </p>
-            </motion.div>
 
-            <motion.div
-              variants={staggerContainer}
-              initial="initial"
-              whileInView="animate"
-              viewport={{ once: true }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-6"
-            >
-              {[
-                { icon: '🤖', name: 'Google Gemini', desc: 'AI Intelligence' },
-                { icon: '☁️', name: 'AWS EC2', desc: 'Cloud Compute' },
-                { icon: '🗄️', name: 'PostgreSQL', desc: 'Database' },
-                { icon: '🚀', name: 'AWS Amplify', desc: 'Frontend Hosting' },
-                { icon: '📞', name: 'Amazon Connect', desc: 'Voice Calls' },
-                { icon: '🗣️', name: 'Amazon Lex', desc: 'Voice Bot' },
-                { icon: '🌐', name: 'Nginx', desc: 'Web Server' },
-                { icon: '⚡', name: 'Node.js', desc: 'Backend API' },
-              ].map((service, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all text-center"
-                >
-                  <div className="text-4xl mb-3">{service.icon}</div>
-                  <h3 className="font-bold text-gray-900 mb-1">{service.name}</h3>
-                  <p className="text-sm text-gray-600">{service.desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* AI Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-12 text-center"
-            >
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg">
-                <Sparkles className="w-5 h-5" />
-                <span className="font-semibold">Powered by Google Gemini Pro AI</span>
-              </div>
-            </motion.div>
-          </div>
-        </section>
 
         {/* CTA Section */}
         <section className="py-32 relative z-20">
@@ -432,73 +360,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* WEATHER MODULE */}
-        <section id="weather" className="py-32 relative z-20 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="text-center mb-20 delay-1 animate-glass-reveal opacity-0">
-              <h2 className="text-display text-text-primary mb-4 text-4xl md:text-5xl text-vibrancy">
-                Atmospheric Control.
-              </h2>
-              <p className="text-body text-text-secondary text-xl">
-                Precision forecasts inside high-fidelity glass surfaces.
-              </p>
-            </div>
-            <div className="max-w-4xl mx-auto relative delay-3 animate-glass-reveal opacity-0">
-              {/* Blurred under-glow for spatial effect */}
-              <div className="absolute inset-x-20 inset-y-10 bg-glassTint-mint opacity-20 blur-[100px] -z-10 rounded-full mix-blend-screen pointer-events-none" />
-              <WeatherDashboard />
-            </div>
-          </div>
-        </section>
 
-        {/* MANDI MODULE */}
-        <section className="py-32 relative z-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 delay-1 animate-glass-reveal opacity-0">
-              <h2 className="text-display text-text-primary mb-4 text-4xl md:text-5xl text-vibrancy">
-                Markets at a Glance.
-              </h2>
-              <p className="text-body text-text-secondary text-xl">
-                Scroll through Tier 1 commodity databases without friction.
-              </p>
-            </div>
-            <div className="max-w-5xl mx-auto relative delay-2 animate-glass-reveal opacity-0">
-              <MandiDashboard />
-            </div>
-          </div>
-        </section>
-
-        {/* THE ENGINE */}
-        <section className="py-32 relative z-20 border-t border-white/5 bg-[#05050A]/40 backdrop-blur-3xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-24 delay-1 animate-glass-reveal opacity-0">
-              <h2 className="text-display text-text-primary mb-6 text-4xl md:text-6xl text-vibrancy">
-                Industrial Power.
-              </h2>
-              <p className="text-body text-text-secondary text-xl max-w-2xl mx-auto font-light">
-                Our infrastructure dynamically allocates resources across advanced AI models and serverless cores.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 delay-2 animate-glass-reveal opacity-0">
-              {[
-                { icon: '🧠', name: 'Bedrock API', desc: 'Cognitive' },
-                { icon: '⚡', name: 'Lambda', desc: 'Compute' },
-                { icon: '🔌', name: 'API Gateway', desc: 'Routing' },
-                { icon: '💾', name: 'DynamoDB', desc: 'Storage' },
-              ].map((service, index) => (
-                <div
-                  key={index}
-                  className="glass-tier-1 p-6 rounded-[24px] glass-specular interactive-glass text-center hover:-translate-y-2 card-hover"
-                >
-                  <div className="text-5xl mb-4 drop-shadow-md">{service.icon}</div>
-                  <h3 className="text-title text-text-primary mb-1 text-lg text-vibrancy">{service.name}</h3>
-                  <p className="text-label text-text-tertiary">{service.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* METRO CTA */}
         <section className="py-40 relative z-20">

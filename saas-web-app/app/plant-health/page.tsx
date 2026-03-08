@@ -25,7 +25,7 @@ export default function PlantHealthPage() {
     const authStatus = localStorage.getItem('isAuthenticated');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
-      
+
       // Get language preference from localStorage
       const storedLanguage = localStorage.getItem('language');
       if (storedLanguage) {
@@ -85,42 +85,44 @@ export default function PlantHealthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-background relative z-10">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+      <header className="glass-tier-2 border-b border-white/5 sticky top-0 z-20 shadow-sm glass-specular">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push('/dashboard/farmer')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 interactive-glass hover:bg-white/10 rounded-xl transition-colors apple-focus"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5 text-text-secondary hover:text-text-primary" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Leaf className="w-7 h-7 text-green-600" />
+                <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2">
+                  <div className="bg-green-500/20 p-2 rounded-xl backdrop-blur-md">
+                    <Leaf className="w-6 h-6 text-green-400" />
+                  </div>
                   {t.title}
                 </h1>
-                <p className="text-sm text-gray-600">{t.subtitle}</p>
+                <p className="text-sm text-text-secondary mt-1">{t.subtitle}</p>
               </div>
             </div>
-            
+
             <button
-              onClick={() => router.push('/dashboard/farmer')}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              onClick={() => router.push('/chat')}
+              className="flex items-center gap-2 px-5 py-2.5 glass-tier-3 text-text-primary rounded-xl interactive-glass glass-specular transition-all active:scale-95 apple-focus"
             >
               <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToChat}</span>
+              <span className="hidden sm:inline font-medium">{t.backToChat}</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex gap-1">
+      <div className="glass-tier-1 border-b border-white/5 glass-specular">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex gap-2 p-1 glass-tier-2 rounded-2xl w-fit">
             {[
               { id: 'scan', label: t.scanTab, icon: Camera },
               { id: 'history', label: t.historyTab, icon: History },
@@ -129,11 +131,10 @@ export default function PlantHealthPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-6 py-3 font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'text-green-600 border-b-2 border-green-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all apple-focus ${activeTab === tab.id
+                    ? 'glass-tier-3 text-text-primary glass-specular shadow-md transform scale-[1.02]'
+                    : 'text-text-secondary hover:text-text-primary interactive-glass hover:bg-white/5'
+                  }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
@@ -147,36 +148,37 @@ export default function PlantHealthPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {activeTab === 'scan' && (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+            <div className="glass-tier-1 rounded-[32px] p-6 glass-specular shadow-xl animate-glass-reveal border border-white/10">
               <LeafScanner />
             </div>
 
             {/* Quick Tips */}
-            <div className="mt-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6 border border-blue-200">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                💡 {language === 'hi' ? 'बेहतर परिणामों के लिए टिप्स' : 'Tips for Better Results'}
+            <div className="mt-6 glass-tier-2 rounded-[28px] p-6 border border-white/10 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2 text-vibrancy">
+                <span className="bg-blue-500/20 p-2 rounded-lg"><TrendingUp className="w-4 h-4 text-blue-300" /></span>
+                {language === 'hi' ? 'बेहतर परिणामों के लिए टिप्स' : 'Tips for Better Results'}
               </h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
-                  {language === 'hi' 
+              <ul className="space-y-3 text-sm text-text-secondary">
+                <li className="flex items-start gap-3 p-3 glass-tier-1 rounded-xl">
+                  <span className="text-green-400 font-bold bg-green-500/10 p-1 rounded-md">✓</span>
+                  {language === 'hi'
                     ? 'अच्छी रोशनी में फोटो लें (प्राकृतिक प्रकाश सबसे अच्छा है)'
                     : 'Take photos in good lighting (natural light is best)'}
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
+                <li className="flex items-start gap-3 p-3 glass-tier-1 rounded-xl">
+                  <span className="text-green-400 font-bold bg-green-500/10 p-1 rounded-md">✓</span>
                   {language === 'hi'
                     ? 'पत्ती को करीब से और स्पष्ट रूप से कैप्चर करें'
                     : 'Capture the leaf closely and clearly'}
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
+                <li className="flex items-start gap-3 p-3 glass-tier-1 rounded-xl">
+                  <span className="text-green-400 font-bold bg-green-500/10 p-1 rounded-md">✓</span>
                   {language === 'hi'
                     ? 'प्रभावित क्षेत्र को फ्रेम के केंद्र में रखें'
                     : 'Keep the affected area in the center of the frame'}
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600">✓</span>
+                <li className="flex items-start gap-3 p-3 glass-tier-1 rounded-xl">
+                  <span className="text-green-400 font-bold bg-green-500/10 p-1 rounded-md">✓</span>
                   {language === 'hi'
                     ? 'धुंधली या अंधेरी तस्वीरों से बचें'
                     : 'Avoid blurry or dark photos'}
@@ -187,48 +189,51 @@ export default function PlantHealthPage() {
         )}
 
         {activeTab === 'history' && (
-          <div>
+          <div className="animate-glass-reveal">
             {healthRecords.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-7xl mb-6">🌿</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t.noRecords}</h3>
-                <p className="text-gray-600 mb-6">{t.scanFirst}</p>
+              <div className="text-center py-20 px-4 glass-tier-1 rounded-[32px] glass-specular border border-white/5">
+                <div className="bg-green-500/10 w-24 h-24 mx-auto rounded-[32px] flex items-center justify-center mb-6">
+                  <div className="text-5xl animate-bounce">🌿</div>
+                </div>
+                <h3 className="text-2xl font-bold text-text-primary mb-3 text-vibrancy">{t.noRecords}</h3>
+                <p className="text-text-secondary mb-8">{t.scanFirst}</p>
                 <button
                   onClick={() => setActiveTab('scan')}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  className="px-8 py-4 glass-tier-3 rounded-2xl text-text-primary interactive-glass glass-specular transition-all active:scale-95 font-semibold apple-focus shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                 >
                   {t.scanTab}
                 </button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {healthRecords.map((record) => (
-                  <div key={record.id} className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-                    <img
-                      src={record.imageUrl}
-                      alt="Plant scan"
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          record.severity === 'High' ? 'bg-red-100 text-red-700' :
-                          record.severity === 'Moderate' ? 'bg-orange-100 text-orange-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
+                {healthRecords.map((record, index) => (
+                  <div key={record.id} className="glass-tier-1 rounded-3xl overflow-hidden glass-specular border border-white/10 interactive-glass group animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <div className="relative">
+                      <img
+                        src={record.imageUrl}
+                        alt="Plant scan"
+                        className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14] to-transparent opacity-60"></div>
+                    </div>
+                    <div className="p-5 relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider backdrop-blur-md ${record.severity === 'High' ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
+                            record.severity === 'Moderate' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' :
+                              'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                          }`}>
                           {record.severity}
                         </span>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          record.status === 'treated' ? 'bg-green-100 text-green-700' :
-                          record.status === 'monitoring' ? 'bg-blue-100 text-blue-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
+                        <span className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider backdrop-blur-md ${record.status === 'treated' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                            record.status === 'monitoring' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                              'bg-white/10 text-text-secondary border border-white/20'
+                          }`}>
                           {record.status}
                         </span>
                       </div>
-                      <h4 className="font-bold text-gray-900 mb-2">{record.disease}</h4>
-                      <p className="text-sm text-gray-600">
-                        {new Date(record.date).toLocaleDateString()}
+                      <h4 className="font-bold text-lg text-text-primary mb-2 text-vibrancy">{record.disease}</h4>
+                      <p className="text-xs text-text-tertiary font-medium">
+                        {new Date(record.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   </div>
@@ -239,74 +244,73 @@ export default function PlantHealthPage() {
         )}
 
         {activeTab === 'insights' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-glass-reveal">
             {/* Health Overview */}
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div className="glass-tier-1 rounded-[28px] p-6 glass-specular border border-white/10 hover:glass-tier-2 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900">{language === 'hi' ? 'कुल स्कैन' : 'Total Scans'}</h3>
-                  <div className="bg-blue-100 p-3 rounded-lg">
-                    <Camera className="w-6 h-6 text-blue-600" />
+                  <h3 className="font-bold text-text-primary h-[24px] flex items-center">{language === 'hi' ? 'कुल स्कैन' : 'Total Scans'}</h3>
+                  <div className="bg-blue-500/20 p-3 rounded-xl border border-blue-500/30">
+                    <Camera className="w-6 h-6 text-blue-400" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{healthRecords.length}</p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-4xl font-bold text-text-primary text-vibrancy">{healthRecords.length}</p>
+                <p className="text-sm text-text-secondary mt-2">
                   {language === 'hi' ? 'इस महीने' : 'This month'}
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div className="glass-tier-1 rounded-[28px] p-6 glass-specular border border-white/10 hover:glass-tier-2 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900">{language === 'hi' ? 'स्वस्थ पौधे' : 'Healthy Plants'}</h3>
-                  <div className="bg-green-100 p-3 rounded-lg">
-                    <Leaf className="w-6 h-6 text-green-600" />
+                  <h3 className="font-bold text-text-primary h-[24px] flex items-center">{language === 'hi' ? 'स्वस्थ पौधे' : 'Healthy Plants'}</h3>
+                  <div className="bg-green-500/20 p-3 rounded-xl border border-green-500/30">
+                    <Leaf className="w-6 h-6 text-green-400" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-green-600">85%</p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-4xl font-bold text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">85%</p>
+                <p className="text-sm text-text-secondary mt-2">
                   {language === 'hi' ? '+5% पिछले सप्ताह से' : '+5% from last week'}
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div className="glass-tier-1 rounded-[28px] p-6 glass-specular border border-white/10 hover:glass-tier-2 transition-all">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900">{language === 'hi' ? 'उपचार दर' : 'Treatment Rate'}</h3>
-                  <div className="bg-purple-100 p-3 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-purple-600" />
+                  <h3 className="font-bold text-text-primary h-[24px] flex items-center">{language === 'hi' ? 'उपचार दर' : 'Treatment Rate'}</h3>
+                  <div className="bg-purple-500/20 p-3 rounded-xl border border-purple-500/30">
+                    <TrendingUp className="w-6 h-6 text-purple-400" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">92%</p>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-4xl font-bold text-purple-400 drop-shadow-[0_0_10px_rgba(192,132,252,0.5)]">92%</p>
+                <p className="text-sm text-text-secondary mt-2">
                   {language === 'hi' ? 'सफलता दर' : 'Success rate'}
                 </p>
               </div>
             </div>
 
             {/* Common Issues */}
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{t.commonIssues}</h3>
+            <div className="glass-tier-2 rounded-[32px] p-8 glass-specular border border-white/10">
+              <h3 className="text-xl font-bold text-text-primary mb-6 text-vibrancy">{t.commonIssues}</h3>
               <div className="space-y-4">
                 {[
                   { name: language === 'hi' ? 'पत्ती झुलसा' : 'Leaf Blight', count: 12, trend: 'down' },
                   { name: language === 'hi' ? 'पाउडरी मिल्ड्यू' : 'Powdery Mildew', count: 8, trend: 'up' },
                   { name: language === 'hi' ? 'जड़ सड़न' : 'Root Rot', count: 5, trend: 'stable' }
                 ].map((issue, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <span className="text-xl">🦠</span>
+                  <div key={idx} className="flex items-center justify-between p-5 glass-tier-1 rounded-2xl border border-white/5 interactive-glass">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center">
+                        <span className="text-2xl">🦠</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">{issue.name}</p>
-                        <p className="text-sm text-gray-600">{issue.count} {language === 'hi' ? 'मामले' : 'cases'}</p>
+                        <p className="font-semibold text-text-primary text-vibrancy">{issue.name}</p>
+                        <p className="text-sm text-text-secondary">{issue.count} {language === 'hi' ? 'मामले' : 'cases'}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      issue.trend === 'down' ? 'bg-green-100 text-green-700' :
-                      issue.trend === 'up' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
-                      {issue.trend === 'down' ? '↓' : issue.trend === 'up' ? '↑' : '→'}
+                    <span className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider backdrop-blur-md ${issue.trend === 'down' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                        issue.trend === 'up' ? 'bg-red-500/20 text-red-300 border border-red-500/30' :
+                          'bg-white/10 text-white/80 border border-white/20'
+                      }`}>
+                      {issue.trend === 'down' ? '↓ DECREASING' : issue.trend === 'up' ? '↑ INCREASING' : '→ STABLE'}
                     </span>
                   </div>
                 ))}
@@ -314,9 +318,9 @@ export default function PlantHealthPage() {
             </div>
 
             {/* Recommendations */}
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">{t.recommendations}</h3>
-              <div className="space-y-3">
+            <div className="glass-tier-1 rounded-[32px] p-8 glass-specular border-2 border-green-500/20 shadow-[0_0_30px_rgba(74,222,128,0.05)]">
+              <h3 className="text-xl font-bold text-text-primary mb-6 text-vibrancy">{t.recommendations}</h3>
+              <div className="space-y-4">
                 {(language === 'hi' ? [
                   'नियमित रूप से पौधों का निरीक्षण करें (सप्ताह में 2-3 बार)',
                   'उचित जल निकासी सुनिश्चित करें',
@@ -328,9 +332,11 @@ export default function PlantHealthPage() {
                   'Use disease-resistant varieties',
                   'Prefer organic pesticides'
                 ]).map((rec, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg">
-                    <span className="text-green-600 font-bold">{idx + 1}.</span>
-                    <p className="text-gray-700">{rec}</p>
+                  <div key={idx} className="flex items-start gap-4 p-4 glass-tier-3 rounded-2xl border border-white/5">
+                    <span className="bg-green-500/20 text-green-300 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 border border-green-500/30">
+                      {idx + 1}
+                    </span>
+                    <p className="text-text-primary pt-1">{rec}</p>
                   </div>
                 ))}
               </div>
