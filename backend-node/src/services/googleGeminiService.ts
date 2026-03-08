@@ -1,35 +1,56 @@
-/**
- * Google Gemini Service - Free AI for Agriculture
- * Replaces AWS Bedrock with Google's Gemini Pro
- */
+// ========================================
+// CORRECTED googleGeminiService.ts
+// Copy this entire file to src/services/googleGeminiService.ts
+// ========================================
 
-import { IntentClassification } from './domainClassifier';
-
-interface GeminiResponse {
+export interface GeminiResponse {
   message: string;
   confidence: number;
-  intent: string;
+  intent: IntentClassification;
+}
+
+interface IntentClassification {
+  type: string;
+  category?: string;
 }
 
 export class GoogleGeminiService {
   private apiKey: string;
-  private apiUrl: string;
+  private model: string = 'gemini-pro';
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
-    // Use v1 API with gemini-pro model (gemini-1.5-flash not available in v1)
-    this.apiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent';
     
     if (!this.apiKey) {
-      console.error('❌ GEMINI_API_KEY is missing!');
+      console.error('❌ CRITICAL: GEMINI_API_KEY environment variable is missing!');
+      console.error('   Add to .env: GEMINI_API_KEY=your-key-here');
     } else {
-      console.log('✅ Google Gemini Service initialized with gemini-pro');
+      // Mask key for security in logs (show last 10 characters)
+      const maskedKey = '*'.repeat(Math.max(0, this.apiKey.length - 10)) + this.apiKey.slice(-10);
+      console.log(`✅ Google Gemini Service initialized with model: ${this.model}`);
+      console.log(`✅ API Key loaded (${maskedKey})`);
     }
   }
 
-  /**
-   * Send message to Gemini and get intelligent response
-   */
+  private buildSystemPrompt(classification: IntentClassification): string {
+    return `You are KrishiMitra, an expert agricultural advisor for Indian farmers.
+    
+You provide practical farming advice including:
+- Crop cultivation and planting guides
+- Pest and disease management
+- Fertilizer and soil recommendations
+- Irrigation scheduling
+- Market price insights
+- Weather-based farming tips
+
+Requirements:
+- Keep responses concise but detailed (150-300 words)
+- Provide actionable advice with specific measurements and timelines
+- Always consider Indian agricultural context and climate
+- Be supportive and encouraging
+- Use simple, clear language`;
+  }
+
   async sendMessageToGemini(
     userInput: string,
     userId: string,
@@ -39,179 +60,196 @@ export class GoogleGeminiService {
       const systemPrompt = this.buildSystemPrompt(classification);
       const fullPrompt = `${systemPrompt}\n\nFarmer's Question: ${userInput}\n\nProvide a helpful, detailed response:`;
 
-      console.log('🤖 Calling Gemini:', {
-        userId,
-        classification,
-        inputLength: userInput.length,
-        apiUrl: this.apiUrl,
-        hasApiKey: !!this.apiKey,
-        promptLength: fullPrompt.length
-      });
+      console.log('🤖 Calling Gemini API');
+      console.log('   User ID:', userId);
+      console.log('   Query Type:', classification.type);
+      console.log('   Input Length:', userInput.length, 'characters');
 
-      const requestBody = {
-        contents: [{
-          parts: [{
-            text: fullPrompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        }
-      };
+      // Use v1beta1 endpoint with header-based API key
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta1/models/${this.model}:generateContent`;
+      
+      console.log('📡 Endpoint:', endpoint);
 
-      console.log('📤 Gemini request body:', JSON.stringify(requestBody, null, 2));
-
-      const response = await fetch(`${this.apiUrl}?key=${this.apiKey}`, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': this.apiKey, // KEY FIX: Use header instead of query param
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                {
+                  text: fullPrompt,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_ONLY_HIGH',
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_ONLY_HIGH',
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_ONLY_HIGH',
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_ONLY_HIGH',
+            },
+          ],
+        }),
       });
 
-      console.log('📥 Gemini response status:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
-      });
+      console.log('📨 Response Status:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Gemini API HTTP error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorText,
-          fullUrl: `${this.apiUrl}?key=${this.apiKey.substring(0, 10)}...`
-        });
-        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        console.error('❌ Gemini API HTTP Error:');
+        console.error('   Status:', response.status);
+        console.error('   Status Text:', response.statusText);
+        console.error('   Response Body:', errorText);
+        
+        throw new Error(`Gemini API HTTP ${response.status}: ${errorText}`);
       }
 
-      const data: any = await response.json();
-      console.log('📦 Gemini raw response:', JSON.stringify(data, null, 2));
+      const data = await response.json();
+      
+      console.log('✅ JSON parsed successfully');
+      console.log('   Candidates count:', data.candidates?.length || 0);
 
-      const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate response.';
+      // Extract AI response from Gemini format
+      let aiMessage = 'Unable to generate response.';
+      
+      if (data.candidates && data.candidates.length > 0) {
+        const candidate = data.candidates[0];
+        
+        // Gemini response structure: candidates[0].content.parts[0].text
+        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+          aiMessage = candidate.content.parts[0].text || aiMessage;
+        } else if (candidate.parts && candidate.parts.length > 0) {
+          // Fallback structure
+          aiMessage = candidate.parts[0].text || aiMessage;
+        }
+      }
 
-      console.log('✅ Gemini response received:', {
-        userId,
-        responseLength: aiMessage.length,
-        preview: aiMessage.substring(0, 100)
-      });
+      console.log('✅ Gemini response received successfully');
+      console.log('   Message length:', aiMessage.length, 'characters');
+      console.log('   First 100 chars:', aiMessage.substring(0, 100), '...');
 
       return {
         message: aiMessage,
         confidence: 0.95,
-        intent: classification
+        intent: classification,
       };
 
     } catch (error) {
-      console.error('❌ Gemini error:', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        classification
-      });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+
+      console.error('❌ GEMINI API ERROR:');
+      console.error('   Message:', errorMessage);
+      console.error('   User ID:', userId);
+      console.error('   Classification:', classification.type);
+      if (errorStack) {
+        console.error('   Stack Trace:', errorStack.substring(0, 500));
+      }
+
+      // Return fallback response instead of throwing
+      const fallbackMsg = this.getFallbackResponse(classification);
+      console.log('⚠️  Returning fallback response due to error');
       
-      // Fallback response
       return {
-        message: this.getFallbackResponse(classification),
-        confidence: 0.5,
-        intent: classification
+        message: fallbackMsg,
+        confidence: 0.3, // Low confidence to indicate fallback
+        intent: classification,
       };
     }
   }
 
-  /**
-   * Build system prompt based on classification
-   */
-  private buildSystemPrompt(classification: IntentClassification): string {
-    const basePrompt = `You are KrishiMitra AI, a friendly and knowledgeable agriculture expert helping Indian farmers succeed.
-
-Your personality:
-- Warm, conversational, and encouraging
-- Patient and understanding of farmers' challenges
-- Practical and solution-oriented
-- Culturally aware of Indian farming practices
-
-Your communication style:
-- Natural and conversational like ChatGPT
-- Provide detailed, helpful responses
-- Break down complex topics into easy-to-understand steps
-- Use examples and specific recommendations
-- Include relevant numbers, measurements, and timings
-- Mention specific product names, varieties, or techniques when helpful
-
-Context: You're helping farmers in India with their agricultural questions. Provide comprehensive, actionable advice that they can implement immediately.`;
-
-    const classificationPrompts: Record<IntentClassification, string> = {
-      'agriculture_crop': `\n\nYour expertise: Crop cultivation, varieties, planting techniques, growth stages, harvesting.
-Provide: Detailed growing guides, variety recommendations, seasonal timing, spacing, companion planting, yield optimization tips.`,
-      
-      'agriculture_weather': `\n\nYour expertise: Weather patterns, seasonal planning, climate adaptation, weather-based farming decisions.
-Provide: Weather impact analysis, monsoon planning, drought/flood management strategies, seasonal crop recommendations.`,
-      
-      'agriculture_soil': `\n\nYour expertise: Soil health, testing, amendments, pH management, nutrient cycles.
-Provide: Soil improvement strategies, testing recommendations, organic matter management, specific amendment suggestions.`,
-      
-      'agriculture_pest': `\n\nYour expertise: Pest identification, disease management, IPM, organic and chemical solutions.
-Provide: Pest identification help, prevention strategies, treatment options (organic and chemical), application timing and methods.`,
-      
-      'agriculture_fertilizer': `\n\nYour expertise: Fertilizer types, NPK ratios, application timing, organic alternatives.
-Provide: Specific fertilizer recommendations with quantities, application schedules, organic options, cost-effective solutions.`,
-      
-      'agriculture_irrigation': `\n\nYour expertise: Water management, irrigation systems, water conservation, scheduling.
-Provide: Irrigation system recommendations, water scheduling, conservation techniques, drip/sprinkler guidance.`,
-      
-      'agriculture_market': `\n\nYour expertise: Market trends, pricing, selling strategies, value addition.
-Provide: Market insights, best selling times, price trends, storage tips, value addition ideas.`,
-      
-      'agriculture_scheme': `\n\nYour expertise: Government schemes, subsidies, eligibility, application processes.
-Provide: Scheme details, eligibility criteria, application steps, required documents, benefits breakdown.`,
-      
-      'agriculture_equipment': `\n\nYour expertise: Farm machinery, tools, equipment selection, maintenance.
-Provide: Equipment recommendations, usage tips, maintenance advice, cost-benefit analysis, alternatives for small farmers.`,
-      
-      'agriculture_livestock': `\n\nYour expertise: Animal husbandry, dairy, poultry, feed management, health.
-Provide: Breed recommendations, feeding schedules, health management, housing requirements, productivity tips.`,
-      
-      'non_agriculture': `\n\nNote: Politely redirect to agriculture topics while being helpful.`
-    };
-
-    return basePrompt + (classificationPrompts[classification] || classificationPrompts['agriculture_crop']);
-  }
-
-  /**
-   * Get fallback response if Gemini fails
-   */
   private getFallbackResponse(classification: IntentClassification): string {
-    const fallbacks: Record<IntentClassification, string> = {
-      'agriculture_crop': 'I can help you with crop cultivation. Please tell me which crop you want to grow and your location, so I can provide specific guidance.',
-      'agriculture_weather': 'Weather plays a crucial role in farming. Please share your location and what farming activity you are planning, so I can provide weather-based advice.',
-      'agriculture_soil': 'Soil health is fundamental to good farming. Tell me about your soil type or the issue you are facing, and I will help you improve it.',
-      'agriculture_pest': 'Pest management is important for crop protection. Describe the pest problem you are facing, and I will suggest effective solutions.',
-      'agriculture_fertilizer': 'Proper fertilization ensures good yields. Tell me about your crop and soil, and I will recommend the right fertilizers.',
-      'agriculture_irrigation': 'Efficient water management is key to farming success. Share your crop and water availability, and I will suggest irrigation strategies.',
-      'agriculture_market': 'Market information helps you get better prices. Tell me which crop you want to sell, and I will provide market insights.',
-      'agriculture_scheme': 'Government schemes can support your farming. Tell me about your farm size and location, and I will inform you about relevant schemes.',
-      'agriculture_equipment': 'Right equipment improves farm efficiency. Tell me about your farming operation, and I will suggest suitable equipment.',
-      'agriculture_livestock': 'Livestock farming requires proper care. Tell me about your animals and the issue you are facing, and I will provide guidance.',
-      'non_agriculture': 'I specialize in agriculture and farming. Please ask me questions related to crops, soil, pests, weather, or farming practices.'
+    const responses: { [key: string]: string } = {
+      'agriculture_crop': 'I can help you with crop cultivation. Please tell me which crop you want to grow, your location, and the season. This will help me provide specific guidance tailored to your farm.',
+      'agriculture_pest': 'I can assist with pest and disease management. Please describe the pest or disease you\'re facing, the affected crop, and your location for better recommendations.',
+      'agriculture_fertilizer': 'I can guide you on fertilizer selection. Tell me your crop type, soil type (if you know it), and location for personalized recommendations.',
+      'agriculture_weather': 'I can help you interpret weather patterns for your farming needs. What crop are you growing and in which region?',
+      'agriculture_market': 'I can provide market price insights and trends. Which crop or agricultural product are you interested in?',
+      'agriculture_irrigation': 'I can help with irrigation scheduling and methods. Tell me your crop type, soil conditions, and location.',
+      'general': 'Hello! I\'m KrishiMitra, your agricultural advisor. I can help you with crop advice, pest management, fertilizers, weather, and market prices. How can I help you today?',
     };
 
-    return fallbacks[classification] || fallbacks['agriculture_crop'];
+    return responses[classification.type] || responses['general'];
   }
 
   /**
-   * Health check for Gemini service
+   * Test if API key is valid and Gemini is accessible
+   * Use this to debug connection issues
    */
-  async healthCheck(): Promise<{ status: string; service: string }> {
-    return {
-      status: this.apiKey ? 'operational' : 'missing_api_key',
-      service: 'Google Gemini Pro'
-    };
+  async testConnection(): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('🧪 Testing Gemini connection...');
+      
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta1/models/${this.model}:generateContent`;
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': this.apiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: 'Say hello.',
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('❌ Test failed:', response.status, error);
+        return {
+          success: false,
+          message: `API returned ${response.status}: ${error}`,
+        };
+      }
+
+      const data = await response.json();
+      console.log('✅ Test successful!');
+      console.log('   Response:', JSON.stringify(data).substring(0, 200), '...');
+      
+      return {
+        success: true,
+        message: 'Gemini API is working correctly',
+      };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('❌ Test error:', msg);
+      return {
+        success: false,
+        message: `Connection test failed: ${msg}`,
+      };
+    }
   }
 }
 
-export default new GoogleGeminiService();
+// Export singleton instance
+export const googleGeminiService = new GoogleGeminiService();
